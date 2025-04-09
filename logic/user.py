@@ -185,6 +185,6 @@ class User:
         :return: String with user's basic information.
         :rtype: str
         """
-        return (f"User(id={self._id}, username='{self._username}', "
-                f"email='{self._email}', name='{self.first_name} {self._last_name}', "
-                f"phone='{self._phone}', birth_date='{self.birth_date}', gender='{self._gender}')")
+        return (f"User(id={self.id}, username='{self.username}', "
+                f"email='{self.email}', name='{self.first_name} {self.last_name}', "
+                f"phone='{self.phone}', birth_date='{self.birth_date}', gender='{self.gender}')")
