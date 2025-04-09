@@ -39,7 +39,7 @@ jobs:
           path: coverage.xml
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v4
+        uses: SonarSource/sonarcloud-github-action@v2
         env: 
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
