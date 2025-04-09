@@ -3,7 +3,18 @@ class User:
     Class used to represent a user in the system.
     """
 
-    def init(self, id: int, username: str, email: str, first_name: str, last_name: str, phone: str, birth_date: str, gender: str, password: str):
+    def __init__(
+            self,
+            id: int,
+            username: str,
+            email: str,
+            first_name: str,
+            last_name: str,
+            phone: str,
+            birth_date: str,
+            gender: str,
+            password: str
+    ):
         """
         Initializes a User object with all user information.
 
@@ -180,7 +191,7 @@ class User:
         """
         self.__password = password
 
-    def _str_(self) -> str:
+    def __str__(self) -> str:
         """Returns a string representation of the User object.
         :return: String with user's basic information.
         :rtype: str

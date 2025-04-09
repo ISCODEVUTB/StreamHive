@@ -26,7 +26,7 @@ class TestUser(unittest.TestCase):
             password="password123"
         )
 
-    def test__init_(self):
+    def test_init_(self):
         """
         Test the initialization of the User object.
     
