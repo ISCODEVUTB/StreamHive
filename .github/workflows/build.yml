@@ -48,3 +48,4 @@ jobs:
             -Dsonar.organization=deviscoutb
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.python.coverage.reportPaths=coverage.xml
+            -Dsonar.exclusions=**/*.dart
