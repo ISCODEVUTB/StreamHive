@@ -1,2 +1,2 @@
-# The Hive
+# StreamHive
 StreamHive
