@@ -31,7 +31,6 @@ jobs:
       - name: Run tests with coverage
         working-directory: backend
         run: |
-          cd backend
           export PYTHONPATH=$PYTHONPATH:$(pwd)
           pytest tests --cov=logic --cov-report=xml --cov-report=term
 
