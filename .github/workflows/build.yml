@@ -31,6 +31,8 @@ jobs:
       - name: Run tests with coverage
         working-directory: backend
         run: |
+          cd backend
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
           pytest tests --cov=logic --cov-report=xml --cov-report=term
 
       - name: Upload coverage report
@@ -50,3 +52,4 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.python.coverage.reportPaths=backend/coverage.xml
             -Dsonar.exclusions=frontend/**
+            -Dsonar.python.version=3.10

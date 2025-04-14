@@ -1,5 +1,5 @@
 import unittest
-from logic.user import User
+from logic.entities.user import User
 
 
 class TestUser(unittest.TestCase):
