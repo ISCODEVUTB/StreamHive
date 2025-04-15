@@ -52,5 +52,12 @@ class TestRating(unittest.TestCase):
         self.assertEqual(self.rating.rate, 4.5, "The rate was not initialized correctly.")
         self.assertEqual(self.rating.created_at, datetime(2025, 4, 11, 14, 30), "The created_at was not initialized correctly.")
 
+    def test_str_method(self):
+        """
+        Test the __str__ method to ensure it returns the correct string format.
+        """
+        expected_str = "Article(id=1, user_id=123, section_id=456, created_at='2025-04-15', has_spoiler=True)"
+        self.assertEqual(str(self.article), expected_str)
+
 if __name__ == '__main__':
     unittest.main()
