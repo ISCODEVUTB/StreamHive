@@ -24,8 +24,6 @@ class Article:
         :type user_id: int
         :param article_id: ID of the section the article makes part of.
         :type article_id: int
-        :param content: The content of the article.
-        :type content: str
         :param created_at: The date and time when the article was posted.
         :type created_at: date
         :param has_spoiler: Indicates if the article contains spoilers.

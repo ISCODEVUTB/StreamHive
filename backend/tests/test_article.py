@@ -32,7 +32,6 @@ class TestArticle(unittest.TestCase):
         ):
             self.article.created_at = "2025-04-11"
 
-
     def test_article_initialization(self):
         """
         Test the initialization of the Article object.
@@ -44,6 +43,22 @@ class TestArticle(unittest.TestCase):
         self.assertEqual(self.article.section_id, 0, "The section ID was not initialized correctly.")
         self.assertEqual(self.article.created_at, date(2025, 4, 11), "The created_at was not initialized correctly.") 
         self.assertFalse(self.article.has_spoiler, "The has_spoiler flag was not initialized correctly.")
+
+    def test_setters_and_getters(self):
+        """
+        Test the setters and getters of the Article object.
+        """
+        self.article.id = 2
+        self.article.user_id = 124
+        self.article.section_id = 457
+        self.article.created_at = date(2025, 5, 1)
+        self.article.has_spoiler = False
+
+        self.assertEqual(self.article.id, 2)
+        self.assertEqual(self.article.user_id, 124)
+        self.assertEqual(self.article.section_id, 457)
+        self.assertEqual(self.article.created_at, date(2025, 5, 1))
+        self.assertFalse(self.article.has_spoiler)
 
 if __name__ == '__main__':
     unittest.main()
