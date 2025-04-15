@@ -42,8 +42,8 @@ class TestArticle(unittest.TestCase):
         self.assertEqual(self.article.id, 1, "The ID was not initialized correctly.")
         self.assertEqual(self.article.user_id, 12345, "The user ID was not initialized correctly.")
         self.assertEqual(self.article.section_id, 0, "The section ID was not initialized correctly.")
-        self.assertEqual(self.article.created_at, date(2025, 4, 11), "The created_at was not initialized correctly.")  # Corregido el valor de comparación
-        self.assertFalse(self.article.has_spoiler, "The has_spoiler flag was not initialized correctly.")  # Corregido el mensaje
+        self.assertEqual(self.article.created_at, date(2025, 4, 11), "The created_at was not initialized correctly.") 
+        self.assertFalse(self.article.has_spoiler, "The has_spoiler flag was not initialized correctly.")
 
 if __name__ == '__main__':
     unittest.main()
