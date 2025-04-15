@@ -19,7 +19,7 @@ class TestRating(unittest.TestCase):
             profile_id=12345,
             movie_id=67890,
             rate = 4.5,
-            created_at=datetime(2025, 4, 15, 14, 30) 
+            created_at=datetime(2025, 4, 11, 14, 30) 
         )
 
     def test_rate_value_error(self):
