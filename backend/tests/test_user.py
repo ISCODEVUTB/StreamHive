@@ -1,5 +1,5 @@
 import unittest
-from logic.entities.user import User
+from backend.logic.entities.user import User
 
 
 class TestUser(unittest.TestCase):
@@ -26,7 +26,7 @@ class TestUser(unittest.TestCase):
             password="password123"
         )
 
-    def test_init_(self):
+    def test_user(self):
         """
         Test the initialization of the User object.
     
