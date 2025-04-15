@@ -12,7 +12,7 @@ class TestMovieList(unittest.TestCase):
 
     def setUp(self):
         """
-        Set up a MovieList object for use in the test case.
+        Set up a MovieList object to use in the test case.
         """
         self.movie_list = MovieList(
             id=1,

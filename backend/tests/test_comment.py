@@ -12,7 +12,7 @@ class TestComment(unittest.TestCase):
 
     def setUp(self):
         """
-        Set up a Comment object for use in the test case.
+        Set up a Comment object to use in the test case.
         """
         self.comment = Comment(
             id=1,
@@ -23,6 +23,7 @@ class TestComment(unittest.TestCase):
             like_by=[2, 3, 4],
             has_spoiler=False
         )
+        
     def test_comment(self):
         """
         Test the initialization of the Comment object.
