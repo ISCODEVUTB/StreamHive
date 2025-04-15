@@ -5,7 +5,7 @@ class Comment:
 
     def __init__(
         self,
-        id: int,
+        id:int,
         user_id: int,
         movie_id: int,
         description: str,
