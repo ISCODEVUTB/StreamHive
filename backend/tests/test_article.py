@@ -19,8 +19,9 @@ class TestArticle(unittest.TestCase):
             id=1,
             user_id=12345,
             section_id=0,
-            created_at=date(2025, 4, 11), 
-            has_spoiler=False  
+            content="Sample content",
+            created_at=date(2025, 4, 11),
+            has_spoiler=False
         )
 
     def test_created_at_type_error(self):
