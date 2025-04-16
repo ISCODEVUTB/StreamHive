@@ -187,15 +187,13 @@ class MovieList:
         """
         self.__movies = value
 
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the MovieList object.
-
-        :return: A formatted string with movie list's key information.
-        :rtype: str
-        """
-        return (
-            f"MovieList(id={self.id}, user_id={self.user_id}, privacy='{self.privacy}', "
-            f"list_name='{self.list_name}', list_description='{self.list_description}', "
-            f"like_by={self.like_by}, saved_by={self.saved_by}, movies={self.movies})"
-        )
+    def __str__(self):
+        return dict(            
+            id=self.id,
+            user_id= self.user_id,
+            privacy= self.privacy,
+            list_name= self.list_name,
+            list_description= self.list_description,
+            like_by=self.like_by,
+            saved_by= self.saved_by,
+            movies= self.movies).__str__()

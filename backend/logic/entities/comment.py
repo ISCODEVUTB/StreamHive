@@ -165,15 +165,7 @@ class Comment:
         """
         self.__has_spoiler = value
 
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the Comment object.
-
-        :return: A formatted string with comment's key information.
-        :rtype: str
-        """
-        return (
-            f"Comment(id={self.id}, user_id={self.user_id}, movie_id={self.movie_id}, "
-            f"description='{self.description}', created_at='{self.created_at}', "
-            f"like_by={self.like_by}, has_spoiler={self.has_spoiler})"
-        )
+    def _str_(self):
+        return dict(id=self.id, user_id=self.user_id, movie_id=self.movie_id,
+                    description=self.description,created_at=self.created_at,
+                    like_by=self.like_by,has_spoiler=self.has_spoiler).__str__()
