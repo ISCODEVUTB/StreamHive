@@ -42,5 +42,30 @@ class TestUser(unittest.TestCase):
         self.assertEqual(self.user.gender, "Masculin", "The gender was not initialized correctly.")
         self.assertEqual(self.user.password, "password123", "The password was not initialized correctly.")
 
+    def test_setters_and_getters(self):
+        """
+        Verify all setters and getters are working for the User entity.
+        """
+        self.user.id = 2
+        self.user.username = "newuser"
+        self.user.email = "newuser@example.com"
+        self.user.first_name = "New"
+        self.user.last_name = "User"
+        self.user.phone = "555-9999"
+        self.user.birth_date = "1995-05-05"
+        self.user.gender = "non-binary"
+        self.user.password = "newsecurepassword"
+
+        self.assertEqual(self.user.id, 2)
+        self.assertEqual(self.user.username, "newuser")
+        self.assertEqual(self.user.email, "newuser@example.com")
+        self.assertEqual(self.user.first_name, "New")
+        self.assertEqual(self.user.last_name, "User")
+        self.assertEqual(self.user.phone, "555-9999")
+        self.assertEqual(self.user.birth_date, "1995-05-05")
+        self.assertEqual(self.user.gender, "non-binary")
+        self.assertEqual(self.user.password, "newsecurepassword")
+
+
 if __name__ == '__main__':
     unittest.main()
