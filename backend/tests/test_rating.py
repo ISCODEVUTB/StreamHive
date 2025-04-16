@@ -29,7 +29,7 @@ class TestRating(unittest.TestCase):
         with self.assertRaises(
             ValueError, msg="The rating must be a value between 0 and 5"
         ):
-            self.rating.rate = "6"
+            self.rating.rate = 6
 
     def test_created_at_type_error(self):
         """
