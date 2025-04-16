@@ -1,5 +1,5 @@
 import unittest
-from datetime import date
+from datetime import date,datetime
 from backend.logic.entities.rating import Rating
 
 
@@ -29,7 +29,7 @@ class TestRating(unittest.TestCase):
         with self.assertRaises(
             ValueError, msg="The rating must be a value between 0 and 5"
         ):
-            self.rate.rate = "2025-04-11"
+            self.rating.rate = "6"
 
     def test_created_at_type_error(self):
         """
@@ -38,7 +38,7 @@ class TestRating(unittest.TestCase):
         with self.assertRaises(
             TypeError, msg="The created at must be a datetime type"
         ):
-            self.rate.created_at = "2025-04-11 14:30"
+            self.rating.created_at = "2025-04-11 14:30"
 
 
     def test_rating_initialization(self):
@@ -48,16 +48,9 @@ class TestRating(unittest.TestCase):
         Verifies if all attributes of the Rating object are correctly set during initialization.
         """
         self.assertEqual(self.rating.profile_id, 12345, "The profile ID was not initialized correctly.")
-        self.assertEqual(self.rating.movie_id, 0, "The movie ID was not initialized correctly.")
+        self.assertEqual(self.rating.movie_id, 67890, "The movie ID was not initialized correctly.")
         self.assertEqual(self.rating.rate, 4.5, "The rate was not initialized correctly.")
         self.assertEqual(self.rating.created_at, datetime(2025, 4, 11, 14, 30), "The created_at was not initialized correctly.")
-
-    def test_str_method(self):
-        """
-        Test the __str__ method to ensure it returns the correct string format.
-        """
-        expected_str = "Article(id=1, user_id=123, section_id=456, created_at='2025-04-15', has_spoiler=True)"
-        self.assertEqual(str(self.article), expected_str)
 
 if __name__ == '__main__':
     unittest.main()
