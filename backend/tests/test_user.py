@@ -1,6 +1,8 @@
 import unittest
+import datetime
 from backend.logic.entities.user import User
-
+from backend.logic.entities.user_status import UserStatus
+from backend.logic.entities.user_types import UserTypes
 
 class TestUser(unittest.TestCase):
     """
@@ -21,9 +23,12 @@ class TestUser(unittest.TestCase):
             first_name="John",
             last_name="Doe",
             phone="1234567890",
-            birth_date="1999-05-05",
+            birth_date=datetime.date(1999, 5, 5),
             gender="Masculin",
-            password="password123"
+            password="password123",
+            created_at=datetime.datetime(2020, 1, 1),
+            status=UserStatus.ACTIVE,
+            user_type=UserTypes.EXTERNAL
         )
 
     def test_user(self):
@@ -32,7 +37,6 @@ class TestUser(unittest.TestCase):
     
         Verifies if all attributes of the User object are correctly set during initialization.
         """
-        self.assertEqual(self.user.id, 12345, "The ID was not initialized correctly.")
         self.assertEqual(self.user.username, "JohnDoe1", "The username was not initialized correctly.")
         self.assertEqual(self.user.email, "johndoe123@hotmail.com", "The email was not initialized correctly.")
         self.assertEqual(self.user.first_name, "John", "The first name was not initialized correctly.")
@@ -41,6 +45,10 @@ class TestUser(unittest.TestCase):
         self.assertEqual(self.user.birth_date, "1999-05-05", "The birthdate was not initialized correctly.")
         self.assertEqual(self.user.gender, "Masculin", "The gender was not initialized correctly.")
         self.assertEqual(self.user.password, "password123", "The password was not initialized correctly.")
+        self.assertEqual(self.user.created_at, "password123", "The password was not initialized correctly.")
+        self.assertEqual(self.user.status, "password123", "The password was not initialized correctly.")
+        self.assertEqual(self.user.user_type, "password123", "The password was not initialized correctly.")
+
 
     def test_setters_and_getters(self):
         """

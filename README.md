@@ -1,2 +1,3 @@
-# StreamHive
-StreamHive
+# THE HIVE
+
+THE HIVE
