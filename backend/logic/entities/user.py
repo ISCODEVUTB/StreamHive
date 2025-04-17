@@ -1,3 +1,9 @@
+from datetime import datetime, timezone
+import uuid
+from user_status import UserStatus
+from user_types import UserTypes
+from backend.core.security import get_password_hash
+
 class User:
     """
     Class used to represent a user in the system.
@@ -5,23 +11,18 @@ class User:
 
     def __init__(
             self,
-            id: int,
-            username: str,
-            email: str,
             first_name: str,
             last_name: str,
-            phone: str,
-            birth_date: str,
             gender: str,
-            password: str
+            birth_date: str,
+            email: str,
+            phone: str,
+            password: str,
+            user_type: UserTypes
     ):
         """
         Initializes a User object with all user information.
 
-        :param id: A unique number that identifies the user in the system.
-        :type id: int
-        :param username: The user's chosen username.
-        :type username: str
         :param email: The user's registered email address.
         :type email: str
         :param first_name: The user's first name.
@@ -36,16 +37,22 @@ class User:
         :type gender: str
         :param password: The user's password.
         :type password: str
+        :param status: The user's status in the app.
+        :type status: UserStatus
+        :param user_type: The user's type in the app.
+        :type password: UserType
         """
-        self.__id = id
-        self.__username = username
+        self.__id = str(uuid.uuid4())
         self.__email = email
         self.__first_name = first_name
         self.__last_name = last_name
         self.__phone = phone
         self.__birth_date = birth_date
         self.__gender = gender
-        self.__password = password
+        self.__password = get_password_hash(password)
+        self.__created_at = str(datetime.now(timezone.utc).isoformat())
+        self.__status = UserStatus.ACTIVE
+        self.__user_type = user_type
 
     @property
     def id(self) -> int:
@@ -54,30 +61,6 @@ class User:
         :rtype: int
         """
         return self.__id
-
-    @id.setter
-    def id(self, val: int):
-        """Sets the user's id.
-        :param val: The new id.
-        :type val: int
-        """
-        self.__id = val
-
-    @property
-    def username(self) -> str:
-        """Returns the user's username.
-        :return: The username.
-        :rtype: str
-        """
-        return self.__username
-
-    @username.setter
-    def username(self, username: str):
-        """Sets the user's username.
-        :param username: The new username.
-        :type username: str
-        """
-        self.__username = username
 
     @property
     def email(self) -> str:
@@ -145,7 +128,7 @@ class User:
 
     @property
     def birth_date(self) -> str:
-        """Returns the user's date of birthdate.
+        """Returns the user's date of birth.
         :return: The birthdate.
         :rtype: str
         """
@@ -154,7 +137,7 @@ class User:
     @birth_date.setter
     def birth_date(self, birth_date: str):
         """Sets the user's date of birth.
-        :param birth_date: The new birthdate.
+        :param birth_date: The new birth date.
         :type birth_date: str
         """
         self.__birth_date = birth_date
@@ -189,13 +172,76 @@ class User:
         :param password: The new password.
         :type password: str
         """
-        self.__password = password
+        self.__password = get_password_hash(password)
+
+    @property
+    def created_at(self) -> str:
+        """Returns the user's creation date.
+        :return: The timestamp when the user was created.
+        :rtype: str
+        """
+        return self.__created_at
+
+    @property
+    def status(self) -> UserStatus:
+        """Returns the user's status.
+        :return: The user's current status.
+        :rtype: UserStatus
+        """
+        return self.__status
+
+    @status.setter
+    def status(self, status: UserStatus):
+        """Sets the user's status.
+        :param status: The new status.
+        :type status: UserStatus
+        """
+        self.__status = status
+
+    @property
+    def user_type(self) -> UserTypes:
+        """Returns the user's type.
+        :return: The type of user.
+        :rtype: UserTypes
+        """
+        return self.__user_type
+
+    @user_type.setter
+    def user_type(self, user_type: UserTypes):
+        """Sets the user's type.
+        :param type: The new type.
+        :type type: UserTypes
+        """
+        self.__user_type = user_type
 
     def __str__(self) -> str:
         """Returns a string representation of the User object.
         :return: String with user's basic information.
         :rtype: str
         """
-        return (f"User(id={self.id}, username='{self.username}', "
-                f"email='{self.email}', name='{self.first_name} {self.last_name}', "
-                f"phone='{self.phone}', birth_date='{self.birth_date}', gender='{self.gender}')")
+        return dict(
+            user_id=self.id,
+            first_name=self.first_name,
+            last_name=self.last_name,
+            gender=self.gender,
+            birth_date=self.birth_date,
+            email=self.email,
+            phone=self.phone,
+            password=self.password,
+            created_at=self.created_at,
+            user_status=self.status.value,
+            user_type=self.user_type.value
+        ).__str__()
+
+if __name__ == '__main__':
+    user = User(
+        'user@gmail.com',
+        'user name',
+        'user last name',
+        '1000000000',
+        '2000-10-10',
+        'Other',
+        'password',
+        UserTypes.EXTERNAL
+    )
+    print(user)
