@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 import uuid
-from user_status import UserStatus
-from user_types import UserTypes
+from backend.logic.entities.user_status import UserStatus
+from backend.logic.entities.user_types import UserTypes
 from backend.core.security import get_password_hash
 
 class User:
@@ -235,13 +235,12 @@ class User:
 
 if __name__ == '__main__':
     user = User(
-        'user@gmail.com',
         'user name',
         'user last name',
+        'Masculin',
+        '2000/01/01',
+        'user@email.com',
         '1000000000',
-        '2000-10-10',
-        'Other',
         'password',
-        UserTypes.EXTERNAL
-    )
+        UserTypes.EXTERNAL)
     print(user)
