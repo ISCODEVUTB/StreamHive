@@ -232,15 +232,3 @@ class User:
             user_status=self.status.value,
             user_type=self.user_type.value
         ).__str__()
-
-if __name__ == '__main__':
-    user = User(
-        'user name',
-        'user last name',
-        'Masculin',
-        '2000/01/01',
-        'user@email.com',
-        '1000000000',
-        'password',
-        UserTypes.EXTERNAL)
-    print(user)

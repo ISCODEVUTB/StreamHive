@@ -73,6 +73,16 @@ class TestUser(unittest.TestCase):
         self.assertTrue(verify_password(new_password, self.user.password))
         self.assertEqual(self.user.status, UserStatus.INACTIVE)
         self.assertEqual(self.user.user_type, UserTypes.INTERNAL)
+    
+    def test_str_representation(self):
+        """
+        Test the __str__ method returns a string with key user information.
+        """
+        user_str = str(self.user)
+        self.assertIn("first_name", user_str)
+        self.assertIn("email", user_str)
+        self.assertIn("user_status", user_str)
+        self.assertIn("user_type", user_str)
 
 
 if __name__ == '__main__':
