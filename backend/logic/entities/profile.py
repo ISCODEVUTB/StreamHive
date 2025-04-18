@@ -8,7 +8,8 @@ class Profile:
     Class used to represent a profile in the system.
     """
 
-    MAX_DESCRIPTION_LENGTH = 200
+    MAX_USERNAME_LENGTH = 50
+    MAX_DESCRIPTION_LENGTH = 500
     
     def __init__(
             self,
@@ -76,6 +77,8 @@ class Profile:
         :param username: The new username.
         :type username: str
         """
+        if len(username) > self.MAX_USERNAME_LENGTH:
+            raise ValueError(f"The username cannot exceed {self.MAX_USERNAME_LENGTH} characters.")
         self.__username = username
 
     @property
@@ -95,7 +98,7 @@ class Profile:
         :type description: str
         """
         if len(description) > self.MAX_DESCRIPTION_LENGTH:
-            raise ValueError
+            raise ValueError(f"The description cannot exceed {self.MAX_DESCRIPTION_LENGTH} characters.")
         self.__description = description
 
     @property

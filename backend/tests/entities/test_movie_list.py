@@ -15,7 +15,7 @@ class TestMovieList(unittest.TestCase):
         Set up a MovieList object to use in the test case.
         """
         self.movie_list = MovieList(
-            id=1,
+            id=None,
             user_id=10,
             privacy="public",
             list_name="Top Movies 2025",
@@ -31,7 +31,7 @@ class TestMovieList(unittest.TestCase):
 
         Verifies if all attributes of the MovieList object are correctly set during initialization.
         """
-        self.assertEqual(self.movie_list.id, 1, "The ID was not initialized correctly.")
+        self.assertIsInstance(self.movie_list.id, str, "The ID should be a string.")
         self.assertEqual(self.movie_list.user_id, 10, "The user_id was not initialized correctly.")
         self.assertEqual(self.movie_list.privacy, "public", "The privacy setting was not initialized correctly.")
         self.assertEqual(self.movie_list.list_name, "Top Movies 2025", "The list_name was not initialized correctly.")
@@ -39,12 +39,11 @@ class TestMovieList(unittest.TestCase):
         self.assertEqual(self.movie_list.like_by, [2, 3], "The like_by list was not initialized correctly.")
         self.assertEqual(self.movie_list.saved_by, [4, 5], "The saved_by list was not initialized correctly.")
         self.assertEqual(self.movie_list.movies, [1001, 1002, 1003], "The movies list was not initialized correctly.")
-    
+
     def test_setters_and_getters(self):
         """
         Verify all setters and getters are working.
         """
-        self.movie_list.id = 2
         self.movie_list.user_id = 20
         self.movie_list.privacy = "private"
         self.movie_list.list_name = "Sci-fi Hits"
@@ -53,7 +52,6 @@ class TestMovieList(unittest.TestCase):
         self.movie_list.saved_by = [6]
         self.movie_list.movies = [2001, 2002]
 
-        self.assertEqual(self.movie_list.id, 2)
         self.assertEqual(self.movie_list.user_id, 20)
         self.assertEqual(self.movie_list.privacy, "private")
         self.assertEqual(self.movie_list.list_name, "Sci-fi Hits")
@@ -61,5 +59,27 @@ class TestMovieList(unittest.TestCase):
         self.assertEqual(self.movie_list.like_by, [1, 4])
         self.assertEqual(self.movie_list.saved_by, [6])
         self.assertEqual(self.movie_list.movies, [2001, 2002])
+
+    def test_list_name_length_validation(self):
+        """
+        Test the validation of list name length.
+        """
+        with self.assertRaises(ValueError):
+            self.movie_list.list_name = "A" * 201  # Exceeds max length of 200 characters
+
+    def test_list_description_length_validation(self):
+        """
+        Test the validation of list description length.
+        """
+        with self.assertRaises(ValueError):
+            self.movie_list.list_description = "A" * 1001  # Exceeds max length of 1000 characters
+
+    def test_privacy_validation(self):
+        """
+        Test the validation of privacy setting.
+        """
+        with self.assertRaises(ValueError):
+            self.movie_list.privacy = "restricted"  # Invalid privacy setting
+
 if __name__ == "__main__":
     unittest.main()

@@ -50,6 +50,14 @@ class TestProfile(unittest.TestCase):
         self.assertEqual(self.profile.description, "Love reviewing movies.")
         self.assertEqual(self.profile.profile_pic_url, "https://example.com/new_pic.png")
         self.assertEqual(self.profile.profile_role, ProfileRoles.CRITIC)
+    
+    def test_username_length_validation(self):
+        """
+        Ensure that a ValueError is raised if username exceeds max allowed length.
+        """
+        long_username = "x" * (Profile.MAX_USERNAME_LENGTH + 1)
+        with self.assertRaises(ValueError, msg="A ValueError should be raised for exceeding max description length."):
+            self.profile.username = long_username
 
     def test_description_length_validation(self):
         """
@@ -58,6 +66,7 @@ class TestProfile(unittest.TestCase):
         long_description = "x" * (Profile.MAX_DESCRIPTION_LENGTH + 1)
         with self.assertRaises(ValueError, msg="A ValueError should be raised for exceeding max description length."):
             self.profile.description = long_description
+    
 
     def test_increment_methods(self):
         """
