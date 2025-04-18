@@ -127,14 +127,13 @@ class Article:
         """
         self.__has_spoiler = value
 
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the Article object.
-
-        :return: A formatted string with article's key information.
-        :rtype: str
-        """
-        return (
-            f"Article(id={self.id}, user_id={self.user_id}, section_id={self.section_id}, "
-            f"created_at='{self.created_at}', has_spoiler={self.has_spoiler})"
-        )
+    def __str__(self): 
+        return dict(
+            id=self.id,
+            user_id=self.user_id,
+            movie_id=self.movie_id,
+            description=self.description,
+            created_at=self.created_at,
+            like_by=self.like_by,
+            has_spoiler=self.has_spoiler
+        ).__str__()

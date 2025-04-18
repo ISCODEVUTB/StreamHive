@@ -1,5 +1,5 @@
 import unittest
-from logic.entities.movie_list import MovieList
+from backend.logic.entities.movie_list import MovieList
 
 
 class TestMovieList(unittest.TestCase):

@@ -164,8 +164,14 @@ class Comment:
         :type value: bool
         """
         self.__has_spoiler = value
-
-    def _str_(self):
-        return dict(id=self.id, user_id=self.user_id, movie_id=self.movie_id,
-                    description=self.description,created_at=self.created_at,
-                    like_by=self.like_by,has_spoiler=self.has_spoiler).__str__()
+        
+    def __str__(self): 
+        return dict(
+            id=self.id,
+            user_id=self.user_id,
+            movie_id=self.movie_id,
+            description=self.description,
+            created_at=self.created_at,
+            like_by=self.like_by,
+            has_spoiler=self.has_spoiler
+        ).__str__()

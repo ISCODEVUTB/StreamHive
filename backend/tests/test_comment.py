@@ -1,6 +1,5 @@
 import unittest
-from logic.entities.comment import Comment 
-
+from backend.logic.entities.comment import Comment 
 
 class TestComment(unittest.TestCase):
     """
