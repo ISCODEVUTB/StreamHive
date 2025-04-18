@@ -4,6 +4,7 @@ from backend.logic.entities.user_status import UserStatus
 from backend.logic.entities.user_types import UserTypes
 from backend.core.security import get_password_hash
 
+
 class User:
     """
     Class used to represent a user in the system.
