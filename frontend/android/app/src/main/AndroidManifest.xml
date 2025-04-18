@@ -3,7 +3,8 @@
         android:label="streamhive"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="false"> <!-- 👈 Esta línea es la clave -->
+        android:usesCleartextTraffic="false"
+        android:allowBackup="false"> 
 
         <activity
             android:name=".MainActivity"
