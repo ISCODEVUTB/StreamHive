@@ -31,7 +31,7 @@ class ProfileController(object):
             return new_profile
         except Exception as e: 
             print(f"Error al agregar perfil: {e}")
-            return None
+            return ""
 
     def get_all(self):
         """

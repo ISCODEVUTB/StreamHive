@@ -112,7 +112,7 @@ class TestProfile(unittest.TestCase):
         self.assertEqual(profile_dict["follow_count"], 0)
         self.assertEqual(profile_dict["movies_rated_count"], 0)
         self.assertEqual(profile_dict["comments_count"], 0)
-        self.assertTrue("created_at" in profile_dict)
+        self.assertIn("created_at" in profile_dict)
 
 
 if __name__ == '__main__':
