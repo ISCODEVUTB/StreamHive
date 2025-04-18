@@ -56,7 +56,7 @@ class TestProfile(unittest.TestCase):
         Ensure that a ValueError is raised if username exceeds max allowed length.
         """
         long_username = "x" * (Profile.MAX_USERNAME_LENGTH + 1)
-        with self.assertRaises(ValueError, msg="A ValueError should be raised for exceeding max description length."):
+        with self.assertRaises(ValueError, msg="A ValueError should be raised for exceeding max username length."):
             self.profile.username = long_username
 
     def test_description_length_validation(self):
@@ -94,6 +94,25 @@ class TestProfile(unittest.TestCase):
         self.assertIn("profile_role", profile_str)
         self.assertIn("comments_count", profile_str)
         self.assertIn("movie_lists_count", profile_str)
+
+    def test_to_dict(self):
+        """
+        Test the to_dict method returns a dictionary with key profile information.
+        """
+        
+        profile_dict = self.profile.to_dict()
+
+        self.assertEqual(profile_dict["profile_id"], self.profile.profile_id)
+        self.assertEqual(profile_dict["username"], self.profile.username)
+        self.assertEqual(profile_dict["description"], self.description)
+        self.assertEqual(profile_dict["profile_pic_url"], self.profile_pic_url)
+        self.assertEqual(profile_dict["profile_role"], self.profile_role.value)
+        self.assertEqual(profile_dict["movie_lists_count"], 2)
+        self.assertEqual(profile_dict["follower_count"], 0)
+        self.assertEqual(profile_dict["follow_count"], 0)
+        self.assertEqual(profile_dict["movies_rated_count"], 0)
+        self.assertEqual(profile_dict["comments_count"], 0)
+        self.assertTrue("created_at" in profile_dict)
 
 
 if __name__ == '__main__':

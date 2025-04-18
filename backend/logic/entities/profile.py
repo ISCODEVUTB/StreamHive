@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 import uuid
+from typing import Optional
 from backend.logic.entities.profile_roles import ProfileRoles
 
 
@@ -17,6 +18,7 @@ class Profile:
             description: str,
             profile_pic_url: str,
             profile_role: ProfileRoles,
+            profile_id: Optional[str] = None
     ):
         """
         Initializes a Profile object with all its information.
@@ -31,7 +33,7 @@ class Profile:
         :type profile_role: ProfileRoles
         """
     
-        self.__profile_id = str(uuid.uuid4())
+        self.__profile_id = profile_id if profile_id else str(uuid.uuid4())
         self.__created_at = datetime.now(timezone.utc).isoformat()
         self.username = username
         self.description = description
@@ -213,11 +215,9 @@ class Profile:
         """
         self.__comments_count += 1
 
-    def __str__(self) -> str:
+    def to_dict(self):
         """
-        Returns a string representation of the Profile object.
-        :return: String with profile's basic information.
-        :rtype: str
+        Creates a dictionary of all the information
         """
         return dict(
             profile_id=self.profile_id,
@@ -231,4 +231,12 @@ class Profile:
             follow_count=self.follow_count,
             movies_rated_count=self.movies_rated_count,
             comments_count=self.comments_count
-        ).__str__()
+        )
+
+    def __str__(self):
+        """
+        Returns a string representation of the Profile object.
+        :return: String with profile's basic information.
+        :rtype: str
+        """
+        return str(self.to_dict())

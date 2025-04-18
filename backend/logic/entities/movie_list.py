@@ -205,4 +205,9 @@ class MovieList:
             movies= self.movies)
 
     def __str__(self):
+        """
+        Returns a string representation of the Movie List object.
+        :return: String with the movie list's basic information.
+        :rtype: str
+        """
         return str(self.to_dict())

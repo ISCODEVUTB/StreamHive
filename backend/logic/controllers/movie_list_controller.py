@@ -3,13 +3,13 @@ import os
 from backend.logic.entities.movie_list import MovieList
 
 PATH = os.getcwd()
-DIR_DATA = PATH + '{0}data{0}'.format(os.sep)
+DIR_DATA = os.path.join(PATH, 'data')
 
 
 class MovieListController(object):
 
     def __init__(self):
-        self.file = '{0}{1}'.format(DIR_DATA, 'storage_movie_lists.json')
+        self.file = os.path.join(DIR_DATA, 'storage_movie_lists.json')
         if not os.path.exists(self.file):
             with open(self.file, 'w', encoding='utf-8') as f:
                 json.dump([], f)
@@ -23,7 +23,6 @@ class MovieListController(object):
             data.append(new_movie_list.to_dict())
             f.seek(0)
             json.dump(data, f, indent=4)
-        f.close()
         return new_movie_list
 
     def get_all(self):
