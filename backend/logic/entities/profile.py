@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 import uuid
 from typing import Optional
+from urllib.parse import urlparse
 from backend.logic.entities.profile_roles import ProfileRoles
 
 
@@ -119,6 +120,11 @@ class Profile:
         :param profile_pic_url: The new picture url.
         :type profile_pic_url: str
         """
+        parsed_url = urlparse(profile_pic_url)
+        
+        if not parsed_url.scheme or not parsed_url.netloc:
+            raise ValueError(f"Invalid URL: '{profile_pic_url}' is not a valid URL.")
+        
         self.__profile_pic_url = profile_pic_url
 
     @property

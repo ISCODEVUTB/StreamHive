@@ -64,9 +64,11 @@ class TestProfile(unittest.TestCase):
         Ensure that a ValueError is raised if description exceeds max allowed length.
         """
         long_description = "x" * (Profile.MAX_DESCRIPTION_LENGTH + 1)
-        with self.assertRaises(ValueError, msg="A ValueError should be raised for exceeding max description length."):
+        with self.assertRaises(
+            ValueError, 
+            msg="A ValueError should be raised for exceeding max description length."
+        ):
             self.profile.description = long_description
-    
 
     def test_increment_methods(self):
         """
@@ -83,6 +85,27 @@ class TestProfile(unittest.TestCase):
         self.assertEqual(self.profile.follow_count, 1, "Follow count should be incremented.")
         self.assertEqual(self.profile.movies_rated_count, 1, "Movies rated count should be incremented.")
         self.assertEqual(self.profile.comments_count, 1, "Comments count should be incremented.")
+
+    def test_invalid_profile_pic_url(self):
+        """
+        Test that setting an invalid profile picture URL raises a ValueError.
+        """
+        invalid_url = "invalid_url"
+        with self.assertRaises(
+            ValueError, 
+            msg="A ValueError should be raised for an invalid url."
+        ):
+            self.profile.profile_pic_url = invalid_url
+    
+    def test_profile_role_assignment(self):
+        """
+        Test that ensures the profile role can be correctly assigned 
+        and that it raises errors for invalid roles.
+        """
+        valid_roles = [ProfileRoles.SUBSCRIBER, ProfileRoles.CRITIC, ProfileRoles.EDITOR]
+        for role in valid_roles:
+            self.profile.profile_role = role
+            self.assertEqual(self.profile.profile_role, role, f"Profile role should be {role}.")
 
     def test_str_representation(self):
         """
