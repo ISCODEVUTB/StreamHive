@@ -28,17 +28,12 @@ class ProfileController:
         if not isinstance(new_profile, Profile):
             raise ValueError("El objeto proporcionado no es una instancia de Profile.")
 
-        try:
-            with open(self.file, 'r+', encoding='utf-8') as f:
-                data = json.load(f)
-                data.append(new_profile.to_dict())
-                f.seek(0)
-                f.truncate()
-                json.dump(data, f, indent=4)
-            return new_profile.profile_id
-        except Exception as e:
-            print(f"Error al agregar perfil: {e}")
-            return ""
+        with open(self.file, 'r+', encoding='utf-8') as f:
+            data = json.load(f)
+            data.append(new_profile.to_dict())  
+            f.seek(0)
+            json.dump(data, f, indent=4)
+        return new_profile
 
     def get_all(self):
         """
