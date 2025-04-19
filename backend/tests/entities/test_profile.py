@@ -127,15 +127,16 @@ class TestProfile(unittest.TestCase):
 
         self.assertEqual(profile_dict["profile_id"], self.profile.profile_id)
         self.assertEqual(profile_dict["username"], self.profile.username)
-        self.assertEqual(profile_dict["description"], self.description)
-        self.assertEqual(profile_dict["profile_pic_url"], self.profile_pic_url)
-        self.assertEqual(profile_dict["profile_role"], self.profile_role.value)
+        self.assertEqual(profile_dict["description"], self.profile.description)
+        self.assertEqual(profile_dict["profile_pic_url"], self.profile.profile_pic_url)
+        self.assertEqual(profile_dict["profile_role"], self.profile.profile_role.value)
         self.assertEqual(profile_dict["movie_lists_count"], 2)
         self.assertEqual(profile_dict["follower_count"], 0)
         self.assertEqual(profile_dict["follow_count"], 0)
         self.assertEqual(profile_dict["movies_rated_count"], 0)
         self.assertEqual(profile_dict["comments_count"], 0)
-        self.assertIn("created_at" in profile_dict)
+        self.assertIn("created_at", profile_dict)
+
 
 
 if __name__ == '__main__':

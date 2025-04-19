@@ -6,12 +6,12 @@ PATH = os.getcwd()
 DIR_DATA = os.path.join(PATH, 'data')
 
 
-class ProfileController(object):
+class ProfileController:
 
     def __init__(self):
         self.file = os.path.join(DIR_DATA, 'storage_profile.json')
         if not os.path.exists(self.file):
-            try: 
+            try:
                 with open(self.file, 'w', encoding='utf-8') as f:
                     json.dump([], f)
             except Exception as e:
@@ -20,22 +20,31 @@ class ProfileController(object):
 
     def add(self, new_profile: Profile) -> str:
         """
-        Add a new profile to the storage.
+        Adds a new profile to the storage.
+
+        :param new_profile: Profile object to be added.
+        :return: The ID of the newly added profile, or empty string if failed.
         """
+        if not isinstance(new_profile, Profile):
+            raise ValueError("El objeto proporcionado no es una instancia de Profile.")
+
         try:
             with open(self.file, 'r+', encoding='utf-8') as f:
                 data = json.load(f)
                 data.append(new_profile.to_dict())
                 f.seek(0)
+                f.truncate()
                 json.dump(data, f, indent=4)
-            return new_profile
-        except Exception as e: 
+            return new_profile.profile_id
+        except Exception as e:
             print(f"Error al agregar perfil: {e}")
             return ""
 
     def get_all(self):
         """
         Retrieve all profiles.
+
+        :return: A list of profile dictionaries.
         """
         try:
             with open(self.file, 'r', encoding='utf-8') as f:
@@ -47,7 +56,10 @@ class ProfileController(object):
 
     def get_by_id(self, profile_id: str):
         """
-        Get a movie list by its UUID (string).
+        Get a profile by its UUID.
+
+        :param profile_id: The ID of the profile to retrieve.
+        :return: The profile dict if found, None otherwise.
         """
         try:
             with open(self.file, 'r', encoding='utf-8') as f:
@@ -56,33 +68,7 @@ class ProfileController(object):
                     if profile.get("profile_id") == profile_id:
                         return profile
         except Exception as e:
-            print(f"Error al obtener perfil con ID {profile_id}: {e}")
+            print(f"Error al obtener perfil con ID '{profile_id}': {e}")
         return None
 
-    def update(self, profile_id: str, updated_profile: Profile) -> bool:
-        """
-        Update an existing profile.
-        
-        Args:
-            profile_id: The ID of the profile to update.
-            updated_profile: A Profile object with updated information.
-        
-        Returns:
-            bool: True if the update was successful, False otherwise.
-        """
-        try:
-            with open(self.file, 'r+', encoding='utf-8') as f:
-                data = json.load(f)
-                
-                # Search for the index of the profile
-                for index, profile in enumerate(data):
-                    if profile.get("profile_id") == profile_id: 
-                        # Update the profile in the position found
-                        data[index] = updated_profile.to_dict()
-                        f.seek(0)
-                        json.dump(data, f, indent=4)
-                        return True  # Updated done successfully
-        except Exception as e:
-            print(f"Error al actualizar perfil con ID {profile_id}: {e}")
-        
-        return False  # Profile not found
+

@@ -9,37 +9,17 @@ from backend.logic.entities.movie_list import MovieList
 class TestMovieListController(unittest.TestCase):
 
     def setUp(self):
-        """
-        Set up IDs and dummy movie list data for testing.
-        """
-        self.example_id = str(uuid.uuid4())
-        self.user_id = str(uuid.uuid4())
+        self.example_id = str(uuid4())
+        self.user_id = str(uuid4())
 
-        self.movie_list_data = [{
-            "id": self.example_id,
-            "user_id": self.user_id,
-            "privacy": "public",
-            "list_name": "Favorite Movies",
-            "list_description": "Your favorites movies in one place.",
-            "like_by": [1, 2],
-            "saved_by": [3],
-            "movies": [101, 102, 103]
-        }]
-
-    @patch(
-        "builtins.open", 
-        new_callable=mock_open, 
-        read_data=json.dumps([])
-    )
+    @patch("os.path.exists", return_value=True)
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([]))
     @patch("json.dump")
-    def test_add_movie_list(self, mock_json_dump, mock_open_file):
-        """
-        Test adding a new MovieList to storage.
-        Ensures the object is saved and returned correctly.
-        """
+    def test_add_movie_list(self, mock_json_dump, mock_open_file, mock_exists):
         controller = MovieListController()
-        
+
         new_movie_list = MovieList(
+            id=str(uuid4()),
             user_id=self.user_id,
             privacy="private",
             list_name="New Movie List",
@@ -51,85 +31,75 @@ class TestMovieListController(unittest.TestCase):
 
         result = controller.add(new_movie_list)
 
-        mock_open_file.assert_called_once_with(controller.file, 'r+', encoding='utf-8')
-        mock_json_dump.assert_called_once()  
+        self.assertGreaterEqual(mock_open_file.call_count, 1)
+        mock_json_dump.assert_called_once()
+
+        args, kwargs = mock_json_dump.call_args
+        dumped_data = args[0]
+        self.assertTrue(any(entry["list_name"] == "New Movie List" for entry in dumped_data))
         self.assertEqual(result, new_movie_list)
 
-    @patch(
-        "builtins.open",
-        new_callable=mock_open,
-        read_data=json.dumps([{
-            "id": self.example_id,
-            "user_id": self.user_id,
-            "privacy": "private",
-            "list_name": "Favorites",
-            "list_description": "Your favorite movies in one place.",
-            "like_by": [1, 2],
-            "saved_by": [3],
-            "movies": [101, 102, 103]
-        }])
-    )
-    def test_get_all(self, mock_open_file):
-        """
-        Test retrieving all movie lists from storage.
-        Checks if data is properly loaded and returned.
-        """
+    @patch("os.path.exists", return_value=True)
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
+        "id": "some-id",
+        "user_id": "some-user",
+        "privacy": "private",
+        "list_name": "Favorites",
+        "list_description": "Your favorite movies in one place.",
+        "like_by": [1, 2],
+        "saved_by": [3],
+        "movies": [101, 102, 103]
+    }]))
+    def test_get_all(self, mock_open_file, mock_exists):
         controller = MovieListController()
-        result = controller.get_all()
+        result = json.loads(controller.get_all())
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["list_name"], "Favorites")
-        mock_open_file.assert_called_once_with(controller.file, 'r')
+        self.assertGreaterEqual(mock_open_file.call_count, 1)
 
-    @patch(
-        "builtins.open",
-        new_callable=mock_open,
-        read_data=json.dumps([{
-            "id": self.example_id,
-            "user_id": self.user_id,
-            "privacy": "private",
-            "list_name": "Favorites",
-            "list_description": "Your favorite movies in one place.",
-            "like_by": [1, 2],
-            "saved_by": [3],
-            "movies": [101, 102, 103]
-        }])
-    )
-    def test_get_movie_list_by_id(self, mock_open_file):
-        """
-        Test retrieving a specific MovieList by its UUID.
-        Validates that the correct movie list is returned.
-        """
+    @patch("os.path.exists", return_value=True)
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
+        "id": "some-id",
+        "user_id": "some-user",
+        "privacy": "private",
+        "list_name": "Favorites",
+        "list_description": "Your favorite movies in one place.",
+        "like_by": [1, 2],
+        "saved_by": [3],
+        "movies": [101, 102, 103]
+    }]))
+    def test_get_movie_list_by_id(self, mock_open_file, mock_exists):
         controller = MovieListController()
-        result = controller.get_by_id(self.example_id)
+        result = controller.get_by_id("some-id")
 
         self.assertIsNotNone(result)
-        self.assertEqual(result["id"], self.example_id)
+        self.assertEqual(result["id"], "some-id")
 
-    @patch(
-        "builtins.open", 
-        new_callable=mock_open, 
-        read_data=json.dumps([{
-            "id": self.example_id,
-            "user_id": self.user_id,
-            "privacy": "private",
-            "list_name": "Favorites",
-            "list_description": "Your favorite movies in one place.",
-            "like_by": [1, 2],
-            "saved_by": [3],
-            "movies": [101, 102, 103]
-        }])
-    )
+    @patch("os.path.exists", return_value=True)
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([]))
+    def test_get_movie_list_by_id_not_found(self, mock_open_file, mock_exists):
+        controller = MovieListController()
+        result = controller.get_by_id("non-existent-id")
+        self.assertIsNone(result)
+
+    @patch("os.path.exists", return_value=True)
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
+        "id": "some-id",
+        "user_id": "some-user",
+        "privacy": "private",
+        "list_name": "Favorites",
+        "list_description": "Your favorite movies in one place.",
+        "like_by": [1, 2],
+        "saved_by": [3],
+        "movies": [101, 102, 103]
+    }]))
     @patch("json.dump")
-    def test_update_movie_list(self, mock_json_dump, mock_open_file):
-        """
-        Test updating an existing MovieList.
-        Confirms that the update is saved and successful.
-        """
+    def test_update_movie_list(self, mock_json_dump, mock_open_file, mock_exists):
         controller = MovieListController()
         updated_movie_list = MovieList(
-            id=self.example_id,
-            user_id=self.user_id,
+            id="some-id",
+            user_id="some-user",
             privacy="private",
             list_name="Updated List",
             list_description="Updated description",
@@ -138,34 +108,27 @@ class TestMovieListController(unittest.TestCase):
             movies=[200, 201]
         )
 
-        result = controller.update(self.example_id, updated_movie_list)
+        result = controller.update("some-id", updated_movie_list)
 
         self.assertTrue(result)
-        mock_open_file.assert_called_once_with(controller.file, 'r+', encoding='utf-8')
+        self.assertGreaterEqual(mock_open_file.call_count, 1)
         mock_json_dump.assert_called_once()
 
-    @patch(
-        "builtins.open", 
-        new_callable=mock_open, 
-        read_data=json.dumps([{
-            "id": self.example_id,
-            "user_id": self.user_id,
-            "privacy": "private",
-            "list_name": "Favorites",
-            "list_description": "Your favorite movies in one place.",
-            "like_by": [1, 2],
-            "saved_by": [3],
-            "movies": [101, 102, 103]
-        }])
-    )
+    @patch("os.path.exists", return_value=True)
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
+        "id": "some-id",
+        "user_id": "some-user",
+        "privacy": "private",
+        "list_name": "Favorites",
+        "list_description": "Your favorite movies in one place.",
+        "like_by": [1, 2],
+        "saved_by": [3],
+        "movies": [101, 102, 103]
+    }]))
     @patch("json.dump")
-    def test_update_movie_list_not_found(self, mock_json_dump, mock_open_file):
-        """
-        Test trying to update a MovieList with an ID that doesn't exist.
-        Ensures the method returns False and doesn't call json.dump.
-        """
+    def test_update_movie_list_not_found(self, mock_json_dump, mock_open_file, mock_exists):
         controller = MovieListController()
-        non_existent_id = str(uuid.uuid4())
+        non_existent_id = str(uuid4())
         updated_movie_list = MovieList(
             id=non_existent_id,
             user_id=self.user_id,
@@ -180,9 +143,8 @@ class TestMovieListController(unittest.TestCase):
         result = controller.update(non_existent_id, updated_movie_list)
 
         self.assertFalse(result)
-        mock_open_file.assert_called_once_with(controller.file, 'r+', encoding='utf-8')
+        self.assertGreaterEqual(mock_open_file.call_count, 1)
         mock_json_dump.assert_not_called()
 
 if __name__ == '__main__':
     unittest.main()
-

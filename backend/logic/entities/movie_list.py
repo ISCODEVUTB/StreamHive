@@ -24,7 +24,7 @@ class MovieList:
         Initializes a MovieList object with all necessary attributes.
 
         :param id: Unique identifier for the movie list.
-        :type id: int
+        :type id: str
         :param user_id: ID of the user who created the list.
         :type user_id: int
         :param privacy: Privacy setting of the list (e.g., 'public', 'private').
@@ -188,7 +188,7 @@ class MovieList:
         :param value: The new list of movie IDs.
         :type value: list
         """
-        self.__movies = value
+        self.__movies = value 
 
     def to_dict(self):
         """

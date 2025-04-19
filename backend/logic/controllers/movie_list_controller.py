@@ -14,7 +14,7 @@ class MovieListController(object):
             with open(self.file, 'w', encoding='utf-8') as f:
                 json.dump([], f)
 
-    def add(self, new_movie_list: MovieList = MovieList()) -> str:
+    def add(self, new_movie_list: MovieList) -> MovieList:
         """
         Add a new movie list to the storage.
         """
@@ -30,10 +30,11 @@ class MovieListController(object):
         Retrieve all movie lists.
         """
         # Opening JSON file
-        with open(self.file, 'r') as openfile:
+        with open(self.file, 'r', encoding='utf-8') as openfile:
             # Reading from json file
             data = json.load(openfile)
-        return data
+            data_str = json.dumps(data)
+        return data_str
 
     def get_by_id(self, movie_list_id: str):
         """
