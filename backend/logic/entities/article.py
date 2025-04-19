@@ -22,8 +22,10 @@ class Article:
         :type id: int
         :param user_id: ID of the user who made the article.
         :type user_id: int
-        :param article_id: ID of the section the article makes part of.
-        :type article_id: int
+        :param section_id: ID of the section of the article.
+        :type section_id: int 
+        :param content: The textual content of the article.
+        :type content: str
         :param created_at: The date and time when the article was posted.
         :type created_at: date
         :param has_spoiler: Indicates if the article contains spoilers.
@@ -32,6 +34,7 @@ class Article:
         self.__id = id
         self.__user_id = user_id
         self.__section_id = section_id
+        self.__content = content 
         self.__created_at = created_at
         self.__has_spoiler = has_spoiler
 
@@ -127,13 +130,32 @@ class Article:
         """
         self.__has_spoiler = value
 
-    def __str__(self): 
+    @property
+    def content(self) -> str:
+        """
+        Returns the content of the article.
+        :return: The article content.
+        :rtype: str
+        """
+        return self.__content
+
+    @content.setter
+    def content(self, value: str):
+        """
+        Sets the content of the article.
+        :param value: The new content.
+        :type value: str
+        """
+        self.__content = value
+
+    def to_dict(self):
         return dict(
             id=self.id,
             user_id=self.user_id,
-            movie_id=self.movie_id,
-            description=self.description,
-            created_at=self.created_at,
-            like_by=self.like_by,
+            section_id=self.section_id,
+            content=self.content,
+            created_at=self.created_at.isoformat(),
             has_spoiler=self.has_spoiler
-        ).__str__()
+        )
+    def __str__(self):
+        return str(self.to_dict())

@@ -82,14 +82,12 @@ class Follow:
             raise TypeError("created_at must be a datetime object")
         self.__created_at = value
 
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the Follow object.
+    def to_dict(self):
+        return dict(            
+            follower_id=self.follower_id ,
+            following_id=self.following_id,
+            created_at= self.created_at)
 
-        :return: A formatted string with follow's key information.
-        :rtype: str
-        """
-        return (
-            f"Follow(follower_id={self.follower_id}, following_id={self.following_id}, "
-            f"created_at='{self.created_at}')"
-        )
+    def __str__(self):
+
+            return str(self.to_dict())

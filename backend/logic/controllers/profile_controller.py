@@ -3,7 +3,7 @@ import os
 from backend.logic.entities.profile import Profile
 
 PATH = os.getcwd()
-DIR_DATA = os.path.join(PATH, 'data')
+DIR_DATA = os.path.join(PATH, 'backend', 'data')
 
 
 class ProfileController:
@@ -70,5 +70,3 @@ class ProfileController:
         except Exception as e:
             print(f"Error al obtener perfil con ID '{profile_id}': {e}")
         return None
-
-

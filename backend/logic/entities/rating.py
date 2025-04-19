@@ -106,15 +106,13 @@ class Rating:
         if not isinstance(value, datetime):
             raise TypeError("created_at must be a datetime object")
         self.__created_at = value
-
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the Rate object.
-
-        :return: A formatted string with rate's key information.
-        :rtype: str
-        """
-        return (
-            f"Rate(profile_id={self.profile_id}, movie_id={self.movie_id}, "
-            f"rate={self.rate}, created_at='{self.created_at}')"
+    
+    def to_dict(self):
+        return dict(
+            profile_id=self.profile_id,
+            movie_id= self.movie_id,
+            rate=self.rate,
+            created_at=self.created_at
         )
+    def __str__(self):
+        return str(self.to_dict())

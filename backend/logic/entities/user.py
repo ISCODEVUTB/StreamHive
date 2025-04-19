@@ -215,11 +215,7 @@ class User:
         """
         self.__user_type = user_type
 
-    def __str__(self) -> str:
-        """Returns a string representation of the User object.
-        :return: String with user's basic information.
-        :rtype: str
-        """
+    def to_dict(self):
         return dict(
             user_id=self.id,
             first_name=self.first_name,
@@ -232,4 +228,6 @@ class User:
             created_at=self.created_at,
             user_status=self.status.value,
             user_type=self.user_type.value
-        ).__str__()
+        )
+    def __str__(self):
+        return str(self.to_dict())
