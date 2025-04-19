@@ -21,7 +21,7 @@ class ProfileController:
         """
         Adds a new profile to the storage.
         :param new_profile: Profile object to be added.
-        :return: The ID of the newly added profile, or empty string if failed.
+        :return: The profile object if successfully added.
         """
         if not isinstance(new_profile, Profile):
             raise ValueError("El objeto proporcionado no es una instancia de Profile.")
@@ -31,6 +31,7 @@ class ProfileController:
             data.append(new_profile.to_dict())  
             f.seek(0)
             json.dump(data, f, indent=4)
+            f.truncate()
         return new_profile
 
     def get_all(self):
@@ -41,7 +42,7 @@ class ProfileController:
         try:
             with open(self.file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-            return json.dumps(data, indent=4)
+            return data
         except Exception as e:
             print(f"Error al obtener perfiles: {e}")
             return []
@@ -57,3 +58,4 @@ class ProfileController:
             for profile in data:
                 if profile.get("profile_id") == profile_id:
                     return profile
+        return None
