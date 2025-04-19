@@ -16,7 +16,7 @@ class CommentController:
     def add(self, new_comment: Comment) -> Comment:
         with open(self.file, 'r+', encoding='utf-8') as f:
             data = json.load(f)
-            data.append(new_comment.to_dict())  # 👈 guarda usando to_dict()
+            data.append(new_comment.to_dict())  
             f.seek(0)
             json.dump(data, f, indent=4)
         return new_comment

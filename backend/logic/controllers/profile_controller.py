@@ -18,7 +18,7 @@ class ProfileController:
                 print(f"Error al crear el archivo: {e}")
                 raise
 
-    def add(self, new_profile: Profile) -> str:
+    def add(self, new_profile: Profile) -> Profile:
         """
         Adds a new profile to the storage.
 
