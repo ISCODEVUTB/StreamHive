@@ -46,9 +46,9 @@ class TestProfileController(unittest.TestCase):
         with self.assertRaises(ValueError):
             controller.add("no_es_un_perfil")
 
-    @patch("builtins.open")
     @patch("os.path.exists", return_value=True)
-    def test_get_all(self, mock_exists, mock_open_file):
+    @patch("builtins.open", new_callable=mock_open)
+    def test_get_all(self, mock_open_file, mock_exists):
         test_data = [{
             "username": "john_doe",
             "description": "I'm John Doe, I love horror and romance movies, this is a test profile.",
@@ -56,13 +56,15 @@ class TestProfileController(unittest.TestCase):
             "profile_role": ProfileRoles.SUBSCRIBER.value,
             "profile_id": self.profile_id
         }]
-        mock_open_file.return_value = mock_open(read_data=json.dumps(test_data)).return_value
+
+        mock_open_file().read.return_value = json.dumps(test_data)
 
         controller = ProfileController()
         result = controller.get_all()
 
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["username"], "john_doe")
+
 
 
 
