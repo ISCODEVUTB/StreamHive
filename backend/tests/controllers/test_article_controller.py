@@ -5,6 +5,7 @@ from datetime import date
 from backend.logic.entities.article import Article
 from backend.logic.controllers.article_controller import ArticleController
 
+
 class TestArticleController(unittest.TestCase):
     """
     Unit tests for the ArticleController class.
@@ -18,7 +19,6 @@ class TestArticleController(unittest.TestCase):
         self.controller = ArticleController()
         self.controller.file = self.test_file  # Override default file with test file
 
-        
         with open(self.test_file, 'w', encoding='utf-8') as f:
             json.dump([], f)
 
@@ -51,6 +51,13 @@ class TestArticleController(unittest.TestCase):
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]['content'], "Test article content")
 
+    def test_add_invalid_object(self):
+        """
+        Test adding an invalid object (not an Article).
+        """
+        with self.assertRaises(ValueError):
+            self.controller.add("esto no es un artículo")
+
     def test_get_all_articles(self):
         """
         Test retrieving all articles from the storage.
@@ -60,6 +67,16 @@ class TestArticleController(unittest.TestCase):
         self.assertIsInstance(articles, list)
         self.assertEqual(len(articles), 1)
         self.assertEqual(articles[0]['id'], 1)
+
+    def test_get_all_with_corrupt_file(self):
+        """
+        Test get_all when the JSON file is corrupt.
+        """
+        with open(self.test_file, 'w', encoding='utf-8') as f:
+            f.write("{ esto no es JSON válido ")
+
+        articles = self.controller.get_all()
+        self.assertEqual(articles, [])
 
     def test_get_article_by_id_found(self):
         """
@@ -77,6 +94,46 @@ class TestArticleController(unittest.TestCase):
         self.controller.add(self.test_article)
         result = self.controller.get_by_id(999)
         self.assertIsNone(result)
+
+    def test_get_article_by_id_with_corrupt_file(self):
+        """
+        Test get_by_id when the file is corrupt.
+        """
+        with open(self.test_file, 'w', encoding='utf-8') as f:
+            f.write("{ archivo roto ")
+
+        result = self.controller.get_by_id(1)
+        self.assertIsNone(result)
+
+    def test_created_at_serialization(self):
+        """
+        Test that created_at is serialized as a string in the stored JSON.
+        """
+        self.controller.add(self.test_article)
+        with open(self.test_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            self.assertIsInstance(data[0]['created_at'], str)
+
+    def test_add_multiple_articles(self):
+        """
+        Test adding multiple articles.
+        """
+        article2 = Article(
+            id=2,
+            user_id=456,
+            section_id=11,
+            content="Second article",
+            created_at=date(2025, 4, 19),
+            has_spoiler=True
+        )
+
+        self.controller.add(self.test_article)
+        self.controller.add(article2)
+
+        articles = self.controller.get_all()
+        self.assertEqual(len(articles), 2)
+        self.assertEqual(articles[1]['id'], 2)
+        self.assertEqual(articles[1]['content'], "Second article")
 
 
 if __name__ == '__main__':
