@@ -37,7 +37,7 @@ class TestProfileController(unittest.TestCase):
         self.assertGreaterEqual(mock_open_file.call_count, 1)
         mock_json_dump.assert_called_once()
 
-        args, kwargs = mock_json_dump.call_args
+        args, _ = mock_json_dump.call_args
         dumped_data = args[0]
         self.assertTrue(any(entry["username"] == "janedoe123" for entry in dumped_data))
         self.assertIn(new_profile.to_dict(), dumped_data)
@@ -48,9 +48,15 @@ class TestProfileController(unittest.TestCase):
         with self.assertRaises(ValueError):
             controller.add("no_es_un_perfil")
 
-    @patch("builtins.open") 
-    @patch("os.path.exists", return_value=True)   
-    def test_get_all(self, mock_open_file):
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
+        "username": "john_doe",
+        "description": "I'm John Doe, I love horror and romance movies, this is a test profile.",
+        "profile_pic_url": "https://example.com/profile_pic.jpg",
+        "profile_role": ProfileRoles.SUBSCRIBER.value,
+        "profile_id": self.profile_id
+    }]))
+    @patch("os.path.exists", return_value=True)
+    def test_get_all(self, mock_open_file, mock_exists):
         m_open = mock_open(read_data=json.dumps(self.profile_data))
         mock_open_file.return_value = m_open.return_value
 

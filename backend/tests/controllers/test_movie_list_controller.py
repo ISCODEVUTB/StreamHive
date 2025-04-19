@@ -34,7 +34,7 @@ class TestMovieListController(unittest.TestCase):
         self.assertGreaterEqual(mock_open_file.call_count, 1)
         mock_json_dump.assert_called_once()
 
-        args, kwargs = mock_json_dump.call_args
+        args, _ = mock_json_dump.call_args
         dumped_data = args[0]
         self.assertTrue(any(entry["list_name"] == "New Movie List" for entry in dumped_data))
         self.assertEqual(result, new_movie_list)
