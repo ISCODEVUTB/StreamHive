@@ -18,9 +18,9 @@ class TestProfileController(unittest.TestCase):
             "profile_id": self.profile_id
         }]
 
-    @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([]))
     @patch("json.dump")
+    @patch("os.path.exists", return_value=True)
     def test_add_profile(self, mock_json_dump, mock_open_file, mock_exists):
         controller = ProfileController()
 
@@ -48,8 +48,8 @@ class TestProfileController(unittest.TestCase):
         with self.assertRaises(ValueError):
             controller.add("no_es_un_perfil")
 
-    @patch("os.path.exists", return_value=True)
-    @patch("builtins.open")
+    @patch("builtins.open") 
+    @patch("os.path.exists", return_value=True)   
     def test_get_all(self, mock_open_file):
         m_open = mock_open(read_data=json.dumps(self.profile_data))
         mock_open_file.return_value = m_open.return_value
