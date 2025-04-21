@@ -1,0 +1,9 @@
+[run]
+omit =
+    backend/tests/controllers/test_user_controller.py
+    backend/api/*
+    backend/core/*
+    backend/logic/models/*
+    backend/logic/schemas/*
+    backend/tests/conftest.py
+    backend/tests/utils/*

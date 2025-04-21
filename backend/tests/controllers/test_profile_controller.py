@@ -4,7 +4,7 @@ from unittest.mock import patch, mock_open
 from uuid import uuid4
 from backend.logic.controllers.profile_controller import ProfileController
 from backend.logic.entities.profile import Profile
-from backend.logic.entities.profile_roles import ProfileRoles
+from backend.logic.enum.profile_roles import ProfileRoles
 
 
 class TestProfileController(unittest.TestCase):

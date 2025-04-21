@@ -1,6 +1,6 @@
 from enum import Enum
 
-class ProfileRoles(Enum):
+class ProfileRoles(str, Enum):
     """
     Enum representing the different roles a user profile can have.
 

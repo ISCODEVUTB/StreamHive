@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 import uuid
 from typing import Optional
 from urllib.parse import urlparse
-from backend.logic.entities.profile_roles import ProfileRoles
+from backend.logic.enum.profile_roles import ProfileRoles
 
 
 class Profile:
@@ -19,7 +19,8 @@ class Profile:
             description: str,
             profile_pic_url: str,
             profile_role: ProfileRoles,
-            profile_id: Optional[str] = None
+            profile_id: Optional[str] = None,
+            created_at: Optional[str] = None
     ):
         """
         Initializes a Profile object with all its information.
@@ -35,7 +36,7 @@ class Profile:
         """
     
         self.__profile_id = profile_id if profile_id else str(uuid.uuid4())
-        self.__created_at = datetime.now(timezone.utc).isoformat()
+        self.__created_at = created_at if created_at else datetime.now(timezone.utc).isoformat()
         self.username = username
         self.description = description
         self.profile_pic_url = profile_pic_url

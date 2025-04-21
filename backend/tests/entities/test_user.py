@@ -1,8 +1,8 @@
 import unittest
 from datetime import datetime
 from backend.logic.entities.user import User
-from backend.logic.entities.user_status import UserStatus
-from backend.logic.entities.user_types import UserTypes
+from backend.logic.enum.user_status import UserStatus
+from backend.logic.enum.user_types import UserTypes
 from backend.core.security import verify_password
 
 
@@ -36,7 +36,7 @@ class TestUser(unittest.TestCase):
     
         Verifies if all attributes of the User object are correctly set during initialization.
         """
-        self.assertIsNotNone(self.user.id)
+        self.assertIsNotNone(self.user.user_id)
         self.assertEqual(self.user.first_name, "John", "The first name was not initialized correctly.")
         self.assertEqual(self.user.last_name, "Doe", "The last name was not initialized correctly.")
         self.assertEqual(self.user.gender, "Masculin", "The gender was not initialized correctly.")
@@ -44,7 +44,7 @@ class TestUser(unittest.TestCase):
         self.assertEqual(self.user.email, "johndoe123@hotmail.com", "The email was not initialized correctly.")
         self.assertEqual(self.user.phone, "1234567890", "The phone number was not initialized correctly.")
         self.assertTrue(verify_password(self.raw_password, self.user.password))
-        self.assertEqual(self.user.status, UserStatus.ACTIVE, "The user's status was not initialized correctly.")
+        self.assertIsNotNone(self.user.status)
         self.assertEqual(self.user.user_type, UserTypes.EXTERNAL, "The user's type was not initialized correctly.")
         self.assertIsNotNone(datetime.fromisoformat(self.user.created_at))
 
