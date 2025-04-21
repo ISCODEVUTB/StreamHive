@@ -5,3 +5,5 @@ omit =
     backend/core/*
     backend/logic/models/*
     backend/logic/schemas/*
+    backend/tests/conftest.py
+    backend/tests/utils/*
