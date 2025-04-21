@@ -1,7 +1,8 @@
 from datetime import datetime, timezone
 import uuid
-from backend.logic.entities.user_status import UserStatus
-from backend.logic.entities.user_types import UserTypes
+from typing import Optional
+from backend.logic.enum.user_status import UserStatus
+from backend.logic.enum.user_types import UserTypes
 from backend.core.security import get_password_hash
 
 
@@ -19,7 +20,10 @@ class User:
             email: str,
             phone: str,
             password: str,
-            user_type: UserTypes
+            user_type: UserTypes,
+            user_id: Optional[str] = None,
+            user_status: Optional[UserStatus] = None,
+            created_at: Optional[str] = None
     ):
         """
         Initializes a User object with all user information.
@@ -43,7 +47,8 @@ class User:
         :param user_type: The user's type in the app.
         :type password: UserType
         """
-        self.__id = str(uuid.uuid4())
+        self.__user_id = user_id if user_id else str(uuid.uuid4())
+        self.__created_at = created_at if created_at else datetime.now(timezone.utc).isoformat()
         self.__email = email
         self.__first_name = first_name
         self.__last_name = last_name
@@ -51,17 +56,16 @@ class User:
         self.__birth_date = birth_date
         self.__gender = gender
         self.__password = get_password_hash(password)
-        self.__created_at = str(datetime.now(timezone.utc).isoformat())
-        self.__status = UserStatus.ACTIVE
+        self.__status = user_status if user_status else UserStatus.ACTIVE
         self.__user_type = user_type
 
     @property
-    def id(self) -> int:
+    def user_id(self) -> int:
         """Returns the user's id.
         :return: The user's id.
         :rtype: int
         """
-        return self.__id
+        return self.__user_id
 
     @property
     def email(self) -> str:
@@ -217,7 +221,7 @@ class User:
 
     def to_dict(self):
         return dict(
-            user_id=self.id,
+            user_id=self.user_id,
             first_name=self.first_name,
             last_name=self.last_name,
             gender=self.gender,
