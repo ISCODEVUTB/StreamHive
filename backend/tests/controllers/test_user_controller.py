@@ -1,0 +1,120 @@
+from fastapi.encoders import jsonable_encoder
+from sqlmodel import Session
+
+from backend.core.security import verify_password
+from backend.logic.models import User
+from backend.logic.controllers import users
+from backend.logic.schemas.users import CreateUser, UpdateUser
+from backend.tests.utils.utils import random_email, random_lower_string, random_date
+
+
+full_name='User Example'
+email=random_email()
+password =random_lower_string
+gender="Masculin"
+birth_date=random_date
+
+
+def test_create_active_external_user(db: Session) -> None:
+    user_in = CreateUser(
+        full_name=full_name,
+        email=email, 
+        password=password,
+        birth_date=birth_date,
+        gender=gender
+    )
+    user = users.create_user(session=db, user_create=user_in)
+    
+    assert user.email == email
+    assert hasattr(user, "hashed_password")
+    assert user.user_type == 'external'
+    assert user.user_status == 'active'
+
+
+def test_check_if_user_is_active_inactive(db: Session) -> None:
+    user_in = CreateUser(
+        full_name=full_name,
+        email=email, 
+        password=password,
+        birth_date=birth_date,
+        gender=gender,
+    )
+    user = users.create_user(session=db, user_create=user_in)
+    user_in_inactive = UpdateUser(
+        user_status='inactive'
+    )
+    if user.user_id is not None:
+        users.update_user(session=db, db_user=user, user_in=user_in_inactive)
+    user_2 = db.get(User, user.id)
+    
+    assert user_2
+    assert user_2.user_status == 'inactive'
+
+
+def test_check_if_user_is_admin(db: Session) -> None:
+    user_in = CreateUser(
+        full_name=full_name,
+        email=email, 
+        password=password,
+        birth_date=birth_date,
+        gender=gender,
+        user_type='admin'
+    )
+    user = users.create_user(session=db, user_create=user_in)
+    assert user.user_type == 'admin'
+
+
+def test_check_if_user_is_internal(db: Session) -> None:
+    user_in = CreateUser(
+        full_name=full_name,
+        email=email, 
+        password=password,
+        birth_date=birth_date,
+        gender=gender,
+        user_type='internal'
+    )
+    user = users.create_user(session=db, user_create=user_in)
+    assert user.user_type == 'internal'
+
+
+def test_get_user(db: Session) -> None:
+    user_in = CreateUser(
+        full_name=full_name,
+        email=email, 
+        password=password,
+        birth_date=birth_date,
+        gender=gender,
+    )
+    user = users.create_user(session=db, user_create=user_in)
+    user_2 = db.get(User, user.user_id)
+    
+    assert user_2
+    assert user.email == user_2.email
+    assert jsonable_encoder(user) == jsonable_encoder(user_2)
+
+
+def test_update_user(db: Session) -> None:
+    user_in = CreateUser(
+        full_name=full_name,
+        email=email, 
+        password=password,
+        birth_date=birth_date,
+        gender=gender,
+    )
+    user = users.create_user(session=db, user_create=user_in)
+    
+    new_fullname = 'Jane Doe'
+    new_password = 'new_password123'
+    user_in_update = UpdateUser(
+        full_name=new_fullname,
+        password=new_password
+    )
+    
+    if user.user_id is not None:
+        users.update_user(session=db, db_user=user, user_in=user_in_update)
+    user_2 = db.get(User, user.id)
+    
+    assert user_2
+    assert user.email == user_2.email
+    assert user_2.full_name == new_fullname
+    assert verify_password(new_password, user_2.hashed_password)

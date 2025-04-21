@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime
 from backend.logic.entities.profile import Profile
-from backend.logic.entities.profile_roles import ProfileRoles
+from backend.logic.enum.profile_roles import ProfileRoles
 
 
 class TestProfile(unittest.TestCase):
