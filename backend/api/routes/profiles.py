@@ -22,25 +22,6 @@ from backend.logic.entities.profile import Profile, ProfileRoles
 
 router = APIRouter(prefix="/profiles", tags=["profiles"])
 
-'''st_object = profile_controller.ProfileController()
-
-@router.get("/")
-async def read_profiles():
-    return st_object.get_all()
-
-
-@router.post("/")
-async def create_profile(
-    username: str,
-    description: str,
-    profile_pic_url: str,
-    profile_role: ProfileRoles,
-
-):
-    student_temp = Profile(username=username, description=description, profile_pic_url=profile_pic_url, profile_role=profile_role)
-    print(student_temp)
-    return st_object.add(student_temp)'''
-
 @router.get(
     "/",
 #    dependencies=[Depends(get_current_active_superuser)],
