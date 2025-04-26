@@ -2,11 +2,11 @@ import random
 import string
 from datetime import datetime, timedelta
 
-from fastapi.testclient import TestClient
+# from fastapi.testclient import TestClient
 
 
 def random_lower_string() -> str:
-    return "".join(random.choices(string.ascii_lowercase, k=32))
+    return "".join(random.choices(string.ascii_lowercase, k=16))
 
 
 def random_email() -> str:
@@ -18,3 +18,8 @@ def random_date():
     delta = datetime(today.year - 18, today.month, today.day) - datetime(today.year - 50, 1, 1)
     random_days = random.randint(0, delta.days)
     return datetime(today.year - 50, 1, 1) + timedelta(days=random_days)
+
+if __name__ == '__main__':
+    print(random_email())
+    print(random_lower_string())
+    print(random_date())
