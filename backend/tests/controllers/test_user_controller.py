@@ -7,7 +7,7 @@ from backend.logic.models import User
 from backend.logic.enum import UserTypes
 from backend.logic.controllers import users
 from backend.logic.schemas.users import CreateUser, UpdateUser
-from backend.tests.utils.utils import random_email, random_lower_string, random_date
+from backend.tests.utils.utils import random_email, random_lower_string, random_birth_date
 
 
 full_name='User Example'
@@ -20,7 +20,7 @@ def test_create_active_external_user(db: Session) -> None:
         full_name=full_name,
         email=random_email(), 
         password =random_lower_string(),
-        birth_date=random_date().date(),
+        birth_date=random_birth_date(),
         gender=gender,
         user_type=user_type
     )
@@ -39,7 +39,7 @@ def test_check_if_user_is_active_inactive(db: Session) -> None:
         full_name=full_name,
         email=random_email(), 
         password =random_lower_string(),
-        birth_date=random_date().date(),
+        birth_date=random_birth_date(),
         gender=gender,
         user_type=user_type
     )
@@ -60,7 +60,7 @@ def test_check_if_user_is_admin(db: Session) -> None:
         full_name=full_name,
         email=random_email(), 
         password =random_lower_string(),
-        birth_date=random_date().date(),
+        birth_date=random_birth_date(),
         gender=gender,
         user_type=UserTypes.ADMIN
     )
@@ -73,7 +73,7 @@ def test_check_if_user_is_internal(db: Session) -> None:
         full_name=full_name,
         email=random_email(), 
         password =random_lower_string(),
-        birth_date=random_date().date(),
+        birth_date=random_birth_date(),
         gender=gender,
         user_type=UserTypes.INTERNAL
     )
@@ -86,7 +86,7 @@ def test_get_user(db: Session) -> None:
         full_name=full_name,
         email=random_email(), 
         password =random_lower_string(),
-        birth_date=random_date().date(),
+        birth_date=random_birth_date(),
         gender=gender,
         user_type=user_type
     )
@@ -104,7 +104,7 @@ def test_update_user(db: Session) -> None:
         full_name=full_name,
         email=random_email(), 
         password =random_lower_string(),
-        birth_date=random_date().date(),
+        birth_date=random_birth_date(),
         gender=gender,
         user_type=user_type
     )
