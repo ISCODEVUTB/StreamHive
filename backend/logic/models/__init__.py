@@ -10,14 +10,14 @@ from .author_article import AuthorArticle
 
 
 __all__ = [
-    User, 
-    Profile, 
-    Follow, 
-    Rating, 
-    MovieList, 
-    Interaction,
-    Article,
-    Section,
-    Newsletter,
-    AuthorArticle
+    "User", 
+    "Profile", 
+    "Follow", 
+    "Rating", 
+    "MovieList", 
+    "Interaction",
+    "Article",
+    "Section",
+    "Newsletter",
+    "AuthorArticle"
 ]

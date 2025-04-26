@@ -5,9 +5,9 @@ from .target_types import TargetTypes
 from .interact_types import InteractTypes
 
 __all__ = [
-    UserTypes,
-    UserStatus,
-    ProfileRoles,
-    TargetTypes,
-    InteractTypes
+    "UserTypes",
+    "UserStatus",
+    "ProfileRoles",
+    "TargetTypes",
+    "InteractTypes"
 ]
