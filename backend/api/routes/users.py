@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Annotated
 
-from fastapi import APIRouter, HTTPException, Body
+from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
 
 #from backend.core.security import get_password_hash
