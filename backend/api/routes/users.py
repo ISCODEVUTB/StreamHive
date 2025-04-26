@@ -136,3 +136,23 @@ def delete_user(
 
     db_user = users.update_user(session=session, db_user=db_user, user_in=user_in)
     return db_user
+
+
+@router.delete(
+    "/{user_id}", 
+#    dependencies=[Depends(get_current_active_superuser)]
+)
+def delete_user_definitely(
+    session: SessionDep, 
+#    current_user: CurrentUser, 
+    user_id: uuid.UUID
+) -> None:
+    db_user = session.get(User, user_id)
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail="The user with this id does not exist in the system",
+        )
+    
+    session.delete(db_user)
+    session.commit()
