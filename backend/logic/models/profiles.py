@@ -4,7 +4,7 @@ from backend.logic.enum import ProfileRoles
 
 
 class Profile(SQLModel, table=True):
-    username: str = Field(unique=True, index=True, max_length=20)
+    username: str = Field(unique=True, index=True, max_length=30)
     description: str | None = Field(default=None, max_length=255)
     profile_role: ProfileRoles = Field(default=ProfileRoles.SUBSCRIBER)
     image_rel_path: str | None = Field(default=None)
