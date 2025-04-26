@@ -3,8 +3,6 @@ import secrets
 import string
 from datetime import datetime, timedelta
 
-# from fastapi.testclient import TestClient
-
 
 def random_lower_string() -> str:
     return "".join(secrets.choice(string.ascii_lowercase) for _ in range(16))
@@ -28,3 +26,4 @@ if __name__ == '__main__':
     print(random_email())
     print(random_lower_string())
     print(random_birth_date())
+    

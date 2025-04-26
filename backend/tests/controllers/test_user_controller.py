@@ -125,3 +125,4 @@ def test_update_user(db: Session) -> None:
     assert user.email == user_2.email
     assert user_2.full_name == new_fullname
     assert verify_password(new_password, user_2.hashed_password)
+    

@@ -10,3 +10,4 @@ class Rating(SQLModel, table=True):
     created_at: datetime = datetime.now(timezone.utc)
 
     profile: "Profile" = Relationship(back_populates="rating")
+    

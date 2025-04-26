@@ -19,3 +19,4 @@ class User(SQLModel, table=True):
     created_at: datetime = datetime.now(timezone.utc)
 
     profile: Optional["Profile"] = Relationship(back_populates="user")
+    

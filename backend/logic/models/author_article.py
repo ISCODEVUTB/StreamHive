@@ -9,3 +9,4 @@ class AuthorArticle(SQLModel, table=True):
 
     profile: "Profile" = Relationship(back_populates='author_article')
     article: "Article" = Relationship(back_populates='author_article')
+    

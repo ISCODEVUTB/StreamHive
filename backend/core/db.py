@@ -43,4 +43,4 @@ def init_db(session: Session):
             birth_date='2005-09-15',
             gender='Masculin'
         )
-        user = create_user(session=session, user_create=user_in)
+        

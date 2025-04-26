@@ -14,4 +14,3 @@ class Follow(SQLModel, table=True):
     following: "Profile" = Relationship(
         back_populates="followers", sa_relationship_kwargs={"foreign_keys": "[Follow.following_id]"}
     )
-

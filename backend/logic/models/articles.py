@@ -15,3 +15,4 @@ class Article(SQLModel, table=True):
     section: "Section" = Relationship(back_populates="article")
     newsletter: Optional["Newsletter"] = Relationship(back_populates="article")
     author_article: list["AuthorArticle"] = Relationship(back_populates="article")
+    

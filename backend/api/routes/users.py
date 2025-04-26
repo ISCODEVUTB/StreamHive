@@ -4,7 +4,6 @@ from typing import Any, Annotated
 from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
 
-#from backend.core.security import get_password_hash
 from backend.logic.models import (
     User
 )
@@ -23,10 +22,10 @@ from backend.api.deps import SessionDep
 
 router = APIRouter(prefix="/users", tags=["users"])
 
+msg = "The user with this id does not exist in the system"
 
 @router.get(
     "/",
-#    dependencies=[Depends(get_current_active_superuser)],
     response_model=UsersPublic,
 )
 def read_users(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
@@ -53,19 +52,11 @@ def read_user_by_id(
     Get a specific user by id.
     """
     user = session.get(User, user_id)
-    """if user == current_user:
-        return user
-    if not current_user:
-        raise HTTPException(
-            status_code=403,
-            detail="The user doesn't have enough privileges",
-        )"""
     return user
 
 
 @router.post(
     "/", 
-#    dependencies=[Depends(get_current_active_superuser)], 
     response_model=UserPublic
 )
 def create_user(*, session: SessionDep, user_in: CreateUser) -> Any:
@@ -100,7 +91,7 @@ def update_user(
     if not db_user:
         raise HTTPException(
             status_code=404,
-            detail="The user with this id does not exist in the system",
+            detail=msg,
         )
     if user_in.email:
         existing_user = users.get_user_by_email(session=session, email=user_in.email)
@@ -116,7 +107,6 @@ def update_user(
 
 @router.post(
     "/{user_id}", 
-#    dependencies=[Depends(get_current_active_superuser)]
 )
 def delete_user(
     session: SessionDep, 
@@ -127,7 +117,7 @@ def delete_user(
     if not db_user:
         raise HTTPException(
             status_code=404,
-            detail="The user with this id does not exist in the system",
+            detail=msg,
         )
     
     user_in = UpdateUser(
@@ -140,7 +130,6 @@ def delete_user(
 
 @router.delete(
     "/{user_id}", 
-#    dependencies=[Depends(get_current_active_superuser)]
 )
 def delete_user_definitely(
     session: SessionDep, 
@@ -151,8 +140,9 @@ def delete_user_definitely(
     if not db_user:
         raise HTTPException(
             status_code=404,
-            detail="The user with this id does not exist in the system",
+            detail=msg,
         )
     
     session.delete(db_user)
     session.commit()
+    

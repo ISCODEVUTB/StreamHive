@@ -26,3 +26,4 @@ class Profile(SQLModel, table=True):
     )
 
     author_article: list["AuthorArticle"] = Relationship(back_populates="profile")
+    

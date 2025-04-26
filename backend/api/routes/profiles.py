@@ -4,7 +4,6 @@ from typing import Any, Annotated
 from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
 
-#from backend.core.security import get_password_hash
 from backend.logic.models import (
     Profile
 )
@@ -24,7 +23,6 @@ router = APIRouter(prefix="/profiles", tags=["profiles"])
 
 @router.get(
     "/",
-#    dependencies=[Depends(get_current_active_superuser)],
     response_model=ProfilesPublic,
 )
 def read_profiles(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
@@ -44,19 +42,11 @@ def read_user_by_id(
     #current_user: CurrentUser
 ) -> Any:
     profile = session.get(Profile, profile_id)
-    """if user == current_user:
-        return user
-    if not current_user:
-        raise HTTPException(
-            status_code=403,
-            detail="The user doesn't have enough privileges",
-        )"""
     return profile
 
 
 @router.post(
     "/", 
-#    dependencies=[Depends(get_current_active_superuser)], 
     response_model=ProfilePublic
 )
 def create_profile(*, session: SessionDep, profile_in: CreateProfile, user_in: uuid.UUID) -> Any:

@@ -14,3 +14,4 @@ class Newsletter(TagBase, table=True):
     newsletter_id: int | None = Field(default=None, primary_key=True)
 
     article: "Article" = Relationship(back_populates='newsletter')
+    
