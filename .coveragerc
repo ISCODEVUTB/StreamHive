@@ -1,6 +1,5 @@
 [run]
 omit =
-    backend/tests/controllers/test_user_controller.py
     backend/api/*
     backend/core/*
     backend/logic/models/*
