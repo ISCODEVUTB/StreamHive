@@ -8,33 +8,22 @@ from backend.logic.models import Article
 from backend.logic.schemas.articles import CreateArticle, UpdateArticle
 
 
-def create_article(*, session: Session, article_create: CreateArticle, article_id: uuid.UUID) -> Article:
-    db_obj = Article.model_validate(
-        article_create, update={"article_id": article_id}
-    )
+def create_article(*, session: Session, article_create: CreateArticle) -> Article:
+    db_obj = Article.model_validate(article_create)
     session.add(db_obj)
     session.commit()
     session.refresh(db_obj)
     return db_obj
 
 
-def update_profile(*, session: Session, db_profile: Article, article_in: UpdateArticle) -> Any:
+def update_article(*, session: Session, db_article: Article, article_in: UpdateArticle) -> Any:
     article_data = article_in.model_dump(exclude_unset=True)
     extra_data = {}
-    db_profile.sqlmodel_update(article_data, update=extra_data)
-    session.add(db_profile)
+    db_article.sqlmodel_update(article_data, update=extra_data)
+    session.add(db_article)
     session.commit()
-    session.refresh(db_profile)
-    return db_profile
-
-
-def update_article(*, session: Session, db_article: Article, article_in: UpdateArticle) -> Article:
-    # Convertir el objeto de entrada en un diccionario excluyendo los valores no establecidos
-    article_data = article_in.model_dump(exclude_unset=True)
-    
-    # Actualizar los atributos del artículo
-    for key, value in article_data.items():
-        setattr(db_article, key, value)
+    session.refresh(db_article)
+    return db_article
 
 
 def get_article_by_section(*, session: Session, section_id: int) -> Optional[Article]:
@@ -43,7 +32,7 @@ def get_article_by_section(*, session: Session, section_id: int) -> Optional[Art
     return session_article
 
 
-def get_article_by_date(*, session: Session, newsletter_date: date) -> Optional[List[Article]]:
+def get_article_by_date(*, session: Session, newsletter_date: date) -> Optional[list[Article]]:
     """
     Retrieves all articles that were created on a specific date, ignoring the time part of created_at.
     """

@@ -39,8 +39,7 @@ def read_profiles(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
 @router.get("/{profile_id}", response_model=ProfilePublic)
 def read_profile_by_id(
     profile_id: uuid.UUID, 
-    session: SessionDep, 
-    #current_user: CurrentUser
+    session: SessionDep,
 ) -> Any:
     profile = session.get(Profile, profile_id)
     return profile

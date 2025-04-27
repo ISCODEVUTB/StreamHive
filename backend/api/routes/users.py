@@ -21,8 +21,8 @@ from backend.api.deps import SessionDep
 
 
 router = APIRouter(prefix="/users", tags=["users"])
-
 msg = "The user with this id does not exist in the system"
+
 
 @router.get(
     "/",

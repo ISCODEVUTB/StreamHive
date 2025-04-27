@@ -4,7 +4,7 @@ from sqlmodel import Session, select
 
 from backend.core.security import get_password_hash, verify_password
 from backend.logic.models import Profile
-from backend.logic.schemas.articles import CreateProfile, UpdateProfile
+from backend.logic.schemas.profiles import CreateProfile, UpdateProfile
 
 
 def create_profile(*, session: Session, profile_create: CreateProfile, user_id: uuid.UUID) -> Profile:

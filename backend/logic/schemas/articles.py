@@ -5,6 +5,7 @@ from sqlmodel import Field, SQLModel
 
 class ArticleBase(SQLModel):
     article_title: str = Field(max_length=100)
+    movie_ref_id: str | None = None
 
 
 class CreateArticle(ArticleBase):
@@ -13,27 +14,30 @@ class CreateArticle(ArticleBase):
 
 
 class UpdateArticle(SQLModel):
-    article_title: str | None = Field(max_length=100)
-    section_id: int | None
-    newsletter_id: int | None
+    article_title: str | None = Field(default=None, max_length=100)
+    section_id: int | None = None
+    newsletter_id: int | None = None
 
 
 class ArticlePublicEXT(ArticleBase):
     article_id: uuid.UUID
-    datetime: datetime
+    created_at: datetime
     section: str
     newsletter: str
 
 
 class ArticlePublic(ArticleBase):
     article_id: uuid.UUID
-    datetime: datetime
+    created_at: datetime
 
 
 class ArticlesPublic(SQLModel):
-    articles: list[ArticlePublicEXT]
+    articles: list[ArticlePublic]
     count: int
 
+class ArticlesPublicEXT(SQLModel):
+    articles: list[ArticlePublicEXT]
+    count: int
 
 class SectionArticles(SQLModel):
     section: str
