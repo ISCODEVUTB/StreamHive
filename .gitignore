@@ -1,6 +1,6 @@
-# Python cache
 __pycache__/
 *.py[cod]
 *.pyo
 .coverage
 .txt
+backend/data/thehive.db
