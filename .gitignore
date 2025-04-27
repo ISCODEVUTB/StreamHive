@@ -3,4 +3,4 @@ __pycache__/
 *.pyo
 .coverage
 .txt
-backend/data/thehive.db
+*.db

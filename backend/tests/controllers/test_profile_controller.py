@@ -1,104 +1,83 @@
-from fastapi.encoders import jsonable_encoder
-import pytest
-from sqlmodel import Session
-
-from backend.core.security import verify_password
-from backend.logic.models import Profile
-from backend.logic.enum import ProfileRoles
-from backend.logic.controllers import users, profiles
-from backend.logic.schemas.users import CreateUser
-from backend.logic.schemas.profiles import CreateProfile, UpdateProfile
-from backend.tests.utils.utils import random_email, random_lower_string, random_birth_date
-
-def user_in():  
-    return CreateUser(
-        email=random_email(), 
-        password =random_lower_string(),
-        birth_date=random_birth_date(),
-        full_name='User Example',
-        gender="Other",
-        user_type="external"
-    )
-
-def test_create_profile(db: Session) -> None:
-    user = users.create_user(session=db, user_create=user_in())
-    
-    profile_in = CreateProfile(
-        username=random_lower_string(),
-        profile_role=ProfileRoles.SUBSCRIBER
-    )
-    profile = profiles.create_profile(session=db, profile_create=profile_in, user_id=user.user_id)
-
-    assert user.user_id == profile.user_id
-    assert profile.username == profile_in.username
-    assert profile.profile_role == ProfileRoles.SUBSCRIBER
+import unittest
+import json
+from unittest.mock import patch, mock_open
+from uuid import uuid4
+from backend.logic.controllers.profile_controller import ProfileController
+from backend.logic.entities.profile import Profile
+from backend.logic.enum.profile_roles import ProfileRoles
 
 
-@pytest.mark.filterwarnings("ignore::DeprecationWarning")
-def test_check_if_profile_is_critic(db: Session) -> None:
-    user = users.create_user(session=db, user_create=user_in())
-    profile_in = CreateProfile(
-        username=random_lower_string(),
-        profile_role=ProfileRoles.SUBSCRIBER
-    )
-    profile = profiles.create_profile(session=db, profile_create=profile_in, user_id=user.user_id)
+class TestProfileController(unittest.TestCase):
 
-    profile_in_critic = UpdateProfile(
-        profile_role=ProfileRoles.CRITIC
-    )
-    if profile.profile_id is not None:
-        profiles.update_profile(session=db, db_profile=profile, profile_in=profile_in_critic)
-    profile_2 = db.get(Profile, profile.profile_id)
-    
-    assert profile_2
-    assert profile_2.profile_role == ProfileRoles.CRITIC
+    def setUp(self):
+        self.profile_id = str(uuid4())
+        self.profile_data = [ {
+            "username": "john_doe",
+            "description": "I'm John Doe, I love horror and romance movies, this is a test profile.",
+            "profile_pic_url": "https://example.com/profile_pic.jpg",
+            "profile_role": ProfileRoles.SUBSCRIBER.value,
+            "profile_id": self.profile_id
+        }]
+
+    @patch("os.path.exists", return_value=True)
+    @patch("json.dump")
+    @patch("backend.logic.controllers.profile_controller.open", new_callable=mock_open, read_data=json.dumps([]))
+    def test_add_profile(self, mock_open_file, mock_json_dump, mock_exists):
+        controller = ProfileController()
+
+        new_profile = Profile(
+            profile_id=str(uuid4()),
+            username="janedoe123",
+            description="Just another test profile, but I'm a critic.",
+            profile_pic_url="https://example.com/pic.jpg",
+            profile_role=ProfileRoles.CRITIC,
+        )
+
+        result = controller.add(new_profile)
+
+        self.assertGreaterEqual(mock_open_file.call_count, 1)
+        mock_json_dump.assert_called_once()
+
+        args, _ = mock_json_dump.call_args
+        dumped_data = args[0]
+        self.assertTrue(any(entry["username"] == "janedoe123" for entry in dumped_data))
+        self.assertIn(new_profile.to_dict(), dumped_data)
+        self.assertEqual(result, new_profile)
+
+    def test_add_profile_with_invalid_object(self):
+        controller = ProfileController()
+        with self.assertRaises(ValueError):
+            controller.add("no_es_un_perfil")
+
+    @patch("os.path.exists", return_value=True)
+    def test_get_all(self, mock_exists):
+        m_open = mock_open(read_data=json.dumps(self.profile_data))
+        with patch("backend.logic.controllers.profile_controller.open", m_open):
+            controller = ProfileController()
+            result = controller.get_all()
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["username"], "john_doe")
+
+    @patch("os.path.exists", return_value=True)
+    def test_get_profile_by_id(self, mock_exists):
+        m_open = mock_open(read_data=json.dumps(self.profile_data))
+        with patch("backend.logic.controllers.profile_controller.open", m_open):
+            controller = ProfileController()
+            result = controller.get_by_id(self.profile_id)
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result["profile_id"], self.profile_id)
+
+    @patch("os.path.exists", return_value=True)
+    def test_get_profile_by_id_not_found(self, mock_exists):
+        m_open = mock_open(read_data=json.dumps(self.profile_data))
+        with patch("backend.logic.controllers.profile_controller.open", m_open):
+            controller = ProfileController()
+            result = controller.get_by_id("non-existent-id")
+
+        self.assertIsNone(result)
 
 
-def test_check_if_profile_is_editor(db: Session) -> None:
-    user = users.create_user(session=db, user_create=user_in())
-    profile_in = CreateProfile(
-        username=random_lower_string(),
-        profile_role=ProfileRoles.EDITOR
-    )
-    profile = profiles.create_profile(session=db, profile_create=profile_in, user_id=user.user_id)
-
-    assert user.user_id == profile.user_id
-    assert profile.username == profile_in.username
-    assert profile.profile_role == ProfileRoles.EDITOR
-
-
-def test_get_profile(db: Session) -> None:
-    user = users.create_user(session=db, user_create=user_in())
-    profile_in = CreateProfile(
-        username=random_lower_string(),
-        profile_role=ProfileRoles.EDITOR
-    )
-    profile = profiles.create_profile(session=db, profile_create=profile_in, user_id=user.user_id)
-    profile_2 = db.get(Profile, profile.profile_id)
-    
-    assert profile_2
-    assert profile.username == profile_2.username
-    assert jsonable_encoder(profile) == jsonable_encoder(profile_2)
-
-
-@pytest.mark.filterwarnings("ignore::DeprecationWarning")
-def test_update_user(db: Session) -> None:
-    user = users.create_user(session=db, user_create=user_in())
-    profile_in = CreateProfile(
-        username=random_lower_string(),
-        profile_role=ProfileRoles.EDITOR
-    )
-    profile = profiles.create_profile(session=db, profile_create=profile_in, user_id=user.user_id)
-    
-    new_username = random_lower_string()
-    profile_in_update = UpdateProfile(
-        username=new_username
-    )
-    
-    if profile.profile_id is not None:
-        profiles.update_profile(session=db, db_profile=profile, profile_in=profile_in_update)
-    profile_2 = db.get(Profile, profile.profile_id)
-    
-    assert profile_2
-    assert profile_2.username == new_username
-    
+if __name__ == '__main__':
+    unittest.main()
