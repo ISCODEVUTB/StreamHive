@@ -17,9 +17,10 @@ from backend.logic.schemas.profiles import (
 )
 from backend.logic.controllers import profiles, profile_controller
 from backend.api.deps import SessionDep
-from backend.logic.entities.profile import Profile, ProfileRoles
+
 
 router = APIRouter(prefix="/profiles", tags=["profiles"])
+
 
 @router.get(
     "/",
@@ -36,7 +37,7 @@ def read_profiles(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
 
 
 @router.get("/{profile_id}", response_model=ProfilePublic)
-def read_user_by_id(
+def read_profile_by_id(
     profile_id: uuid.UUID, 
     session: SessionDep, 
     #current_user: CurrentUser
@@ -59,3 +60,53 @@ def create_profile(*, session: SessionDep, profile_in: CreateProfile, user_in: u
     
     profile = profiles.create_profile(session=session, profile_create=profile_in, user_id=user_in)
     return profile
+
+
+@router.patch(
+    "/{profile_id}",
+    response_model=ProfilePublic,
+)
+def update_profile(
+    *,
+    session: SessionDep,
+    profile_id: uuid.UUID,
+    profile_in: UpdateProfile,
+) -> Any:
+    """
+    Update a user.
+    """
+    db_profile = session.get(Profile, profile_id)
+    if not db_profile:
+        raise HTTPException(
+            status_code=404,
+            detail="The profile with this id does not exist in the system",
+        )
+    if profile_in.username:
+        existing_profile = profiles.get_profile_by_username(session=session, username=profile_in.username)
+        if existing_profile and existing_profile.profile_id != profile_id:
+            raise HTTPException(
+                status_code=409, detail="Profile with this username already exists"
+            )
+
+    db_profile = profiles.update_profile(session=session, db_profile=db_profile, profile_in=profile_in)
+    return db_profile
+
+
+@router.delete(
+    "/{profile_id}", 
+#    dependencies=[Depends(get_current_active_superuser)]
+)
+def delete_profile(
+    session: SessionDep, 
+#    current_user: CurrentUser, 
+    profile_id: uuid.UUID
+) -> None:
+    db_profile = session.get(Profile, profile_id)
+    if not db_profile:
+        raise HTTPException(
+            status_code=404,
+            detail="The profile with this id does not exist in the system",
+        )
+    
+    session.delete(db_profile)
+    session.commit()

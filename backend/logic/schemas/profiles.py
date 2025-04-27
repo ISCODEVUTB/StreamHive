@@ -7,23 +7,22 @@ from backend.logic.enum.profile_roles import ProfileRoles
 class ProfileBase(SQLModel):
     username: str = Field(max_length=20)
     description: str | None = Field(default=None, max_length=255)
-    profile_role: ProfileRoles = Field(default=ProfileRoles.SUBSCRIBER)
+    profile_role: ProfileRoles = None
 
 
 class CreateProfile(ProfileBase):
-    profile_id: uuid.UUID
     image_rel_path: str | None = Field(default=None)
 
 
 class UpdateProfile(ProfileBase):
-    username: str | None = Field(max_length=20)
-    image_rel_path: str | None = Field(default=None)
+    username: str | None = Field(default=None, max_length=20)
+    image_rel_path: str | None = None
 
 
 class UpdateLogged(SQLModel):
-    username: str | None = Field(max_length=20)
+    username: str | None = Field(default=None, max_length=20)
     description: str | None = Field(default=None, max_length=255)
-    image_rel_path: str | None = Field(default=None)
+    image_rel_path: str | None = None
 
 
 class ProfilePublicEXT(ProfileBase):

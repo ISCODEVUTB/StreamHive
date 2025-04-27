@@ -38,4 +38,3 @@ def db():
         for model in models:
             session.exec(delete(model))
         session.commit()
-        

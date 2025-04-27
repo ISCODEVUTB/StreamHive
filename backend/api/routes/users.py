@@ -145,4 +145,3 @@ def delete_user_definitely(
     
     session.delete(db_user)
     session.commit()
-    

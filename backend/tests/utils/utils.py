@@ -26,4 +26,3 @@ if __name__ == '__main__':
     print(random_email())
     print(random_lower_string())
     print(random_birth_date())
-    
