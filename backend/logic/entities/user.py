@@ -60,10 +60,10 @@ class User:
         self.__user_type = user_type
 
     @property
-    def user_id(self) -> int:
+    def user_id(self) -> uuid.UUID:
         """Returns the user's id.
         :return: The user's id.
-        :rtype: int
+        :rtype: uuid
         """
         return self.__user_id
 

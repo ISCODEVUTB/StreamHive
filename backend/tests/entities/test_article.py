@@ -1,5 +1,6 @@
 import unittest
-from datetime import date
+import uuid
+from datetime import datetime
 from backend.logic.entities.article import Article
 
 
@@ -15,12 +16,12 @@ class TestArticle(unittest.TestCase):
         """
         Set up the test environment by initializing a sample Article object.
         """
+        self.user_id = uuid.uuid4()
         self.article = Article(
-            id=1,
-            user_id=12345,
+            user_id=self.user_id,
             section_id=0,
             content="Sample content",
-            created_at=date(2025, 4, 11),
+            created_at=datetime(2025, 4, 11, 14, 30),
             has_spoiler=False
         )
 
@@ -29,9 +30,15 @@ class TestArticle(unittest.TestCase):
         Verify that a TypeError is raised when 
         """
         with self.assertRaises(
-            TypeError, msg="The created at must be a date type"
+            TypeError, msg="The created at must be a datetime object"
         ):
             self.article.created_at = "2025-04-11"
+
+    def test_article_id(self):
+        """
+        Test that the article ID is correctly generated as a UUID.
+        """
+        self.assertIsInstance(self.article.id, uuid.UUID, "The ID is not a valid UUID.")
 
     def test_article_initialization(self):
         """
@@ -39,10 +46,9 @@ class TestArticle(unittest.TestCase):
     
         Verifies if all attributes of the Article object are correctly set during initialization.
         """
-        self.assertEqual(self.article.id, 1, "The ID was not initialized correctly.")
-        self.assertEqual(self.article.user_id, 12345, "The user ID was not initialized correctly.")
+        self.assertEqual(self.article.user_id, self.user_id, "The user ID was not initialized correctly.")
         self.assertEqual(self.article.section_id, 0, "The section ID was not initialized correctly.")
-        self.assertEqual(self.article.created_at, date(2025, 4, 11), "The created_at was not initialized correctly.") 
+        self.assertEqual(self.article.created_at, datetime(2025, 4, 11, 14, 30), "The created_at was not initialized correctly.")
         self.assertFalse(self.article.has_spoiler, "The has_spoiler flag was not initialized correctly.")
         self.assertEqual(self.article.content, "Sample content", "The content was not initialized correctly.")
 
@@ -50,17 +56,16 @@ class TestArticle(unittest.TestCase):
         """
         Test the setters and getters of the Article object.
         """
-        self.article.id = 2
-        self.article.user_id = 124
+        new_user_id = uuid.uuid4()
+        self.article.user_id = new_user_id
         self.article.section_id = 457
-        self.article.created_at = date(2025, 5, 1)
+        self.article.created_at = datetime(2025, 5, 1, 10, 30)
         self.article.has_spoiler = False
         self.article.content = "New content"
 
-        self.assertEqual(self.article.id, 2)
-        self.assertEqual(self.article.user_id, 124)
+        self.assertEqual(self.article.user_id, new_user_id)
         self.assertEqual(self.article.section_id, 457)
-        self.assertEqual(self.article.created_at, date(2025, 5, 1))
+        self.assertEqual(self.article.created_at, datetime(2025, 5, 1, 10, 30))
         self.assertFalse(self.article.has_spoiler)
         self.assertEqual(self.article.content, "New content")
 

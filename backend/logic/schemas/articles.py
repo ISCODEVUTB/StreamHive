@@ -1,5 +1,5 @@
 import uuid
-from datetime import date
+from datetime import datetime
 from sqlmodel import Field, SQLModel
 
 
@@ -20,14 +20,14 @@ class UpdateArticle(SQLModel):
 
 class ArticlePublicEXT(ArticleBase):
     article_id: uuid.UUID
-    date: date
+    datetime: datetime
     section: str
     newsletter: str
 
 
 class ArticlePublic(ArticleBase):
     article_id: uuid.UUID
-    date: date
+    datetime: datetime
 
 
 class ArticlesPublic(SQLModel):

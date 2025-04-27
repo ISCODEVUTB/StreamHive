@@ -4,7 +4,7 @@ from sqlmodel import Session, select
 
 from backend.core.security import get_password_hash, verify_password
 from backend.logic.models import Profile
-from backend.logic.schemas.profiles import CreateProfile, UpdateProfile
+from backend.logic.schemas.articles import CreateProfile, UpdateProfile
 
 
 def create_profile(*, session: Session, profile_create: CreateProfile, user_id: uuid.UUID) -> Profile:
@@ -18,9 +18,9 @@ def create_profile(*, session: Session, profile_create: CreateProfile, user_id: 
 
 
 def update_profile(*, session: Session, db_profile: Profile, profile_in: UpdateProfile) -> Any:
-    user_data = profile_in.model_dump(exclude_unset=True)
+    profile_data = profile_in.model_dump(exclude_unset=True)
     extra_data = {}
-    db_profile.sqlmodel_update(user_data, update=extra_data)
+    db_profile.sqlmodel_update(profile_data, update=extra_data)
     session.add(db_profile)
     session.commit()
     session.refresh(db_profile)

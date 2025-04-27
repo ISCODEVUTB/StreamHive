@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import datetime
+import uuid
 
 
 class Article:
@@ -8,18 +9,15 @@ class Article:
 
     def __init__(
         self,
-        id:int,
-        user_id: int,
+        user_id: uuid.UUID,
         section_id: int,
         content: str,
-        created_at: date,
+        created_at: datetime,
         has_spoiler: bool
     ):
         """
         Initializes an Article object with all its information.
 
-        :param id: Unique identifier for the comment.
-        :type id: int
         :param user_id: ID of the user who made the article.
         :type user_id: int
         :param section_id: ID of the section of the article.
@@ -31,7 +29,7 @@ class Article:
         :param has_spoiler: Indicates if the article contains spoilers.
         :type has_spoiler: bool
         """
-        self.__id = id
+        self.__id = uuid.uuid4()
         self.__user_id = user_id
         self.__section_id = section_id
         self.__content = content 
@@ -47,30 +45,21 @@ class Article:
         """
         return self.__id
 
-    @id.setter
-    def id(self, value: int):
-        """
-        Sets the article's ID.
-        :param value: The new ID.
-        :type value: int
-        """
-        self.__id = value
-
     @property
-    def user_id(self) -> int:
+    def user_id(self) -> uuid.UUID:
         """
         Returns the ID of the user who made the article.
         :return: The user's ID.
-        :rtype: int
+        :rtype: uuid
         """
         return self.__user_id
 
     @user_id.setter
-    def user_id(self, value: int):
+    def user_id(self, value: uuid.UUID):
         """
         Sets the user ID associated with the article.
         :param value: The new user ID.
-        :type value: int
+        :type value: uuid
         """
         self.__user_id = value
 
@@ -93,7 +82,7 @@ class Article:
         self.__section_id = value
 
     @property
-    def created_at(self) -> date:
+    def created_at(self) -> datetime:
         """
         Returns the date and time the article was posted.
         :return: The creation timestamp.
@@ -102,13 +91,13 @@ class Article:
         return self.__created_at
 
     @created_at.setter
-    def created_at(self, value: date):
+    def created_at(self, value: datetime):
         """
         Sets the creation date and time of the article.
         :param value: The new creation timestamp.
         :type value: date
         """
-        if not isinstance(value, date):
+        if not isinstance(value, datetime):
             raise TypeError("created_at must be a date object")
         self.__created_at = value
 
@@ -150,8 +139,8 @@ class Article:
 
     def to_dict(self):
         return dict(
-            id=self.id,
-            user_id=self.user_id,
+            id=str(self.id),
+            user_id=str(self.user_id),
             section_id=self.section_id,
             content=self.content,
             created_at=self.created_at.isoformat(),
