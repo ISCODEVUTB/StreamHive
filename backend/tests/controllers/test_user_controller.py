@@ -34,7 +34,7 @@ def test_create_active_external_user(db: Session) -> None:
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
-def test_check_if_user_is_active_inactive(db: Session) -> None:
+def test_check_if_user_is_inactive(db: Session) -> None:
     user_in = CreateUser(
         full_name=full_name,
         email=random_email(), 
