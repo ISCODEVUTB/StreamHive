@@ -19,11 +19,11 @@ class SectionsPublic(SQLModel):
     count: int
 
 
-class SectionPublic(SQLModel):
+class NewsletterPublic(SQLModel):
     newsletter_id: int
     name: str
 
 
-class SectionsPublic(SQLModel):
+class NewslettersPublic(SQLModel):
     newsletters: list[SectionPublic]
     count: int
