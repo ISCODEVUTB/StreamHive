@@ -23,7 +23,6 @@ class TestArticleController(unittest.TestCase):
             json.dump([], f)
 
         self.test_article = Article(
-            id=1,
             user_id=123,
             section_id=10,
             content="Test article content",
