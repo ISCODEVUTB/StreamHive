@@ -30,6 +30,8 @@ class TestArticleController(unittest.TestCase):
             has_spoiler=False
         )
 
+        self.article_id = self.test_article.id
+
     def tearDown(self):
         """
         Remove the test file after each test run.
@@ -65,7 +67,7 @@ class TestArticleController(unittest.TestCase):
         articles = self.controller.get_all()
         self.assertIsInstance(articles, list)
         self.assertEqual(len(articles), 1)
-        self.assertEqual(articles[0]['id'], 1)
+        self.assertIsNotNone(articles[0]['id'])
 
     def test_get_all_with_corrupt_file(self):
         """
@@ -82,9 +84,9 @@ class TestArticleController(unittest.TestCase):
         Test retrieving an article by ID that exists.
         """
         self.controller.add(self.test_article)
-        found = self.controller.get_by_id(1)
+        found = self.controller.get_by_id(self.article_id)
         self.assertIsNotNone(found)
-        self.assertEqual(found['id'], 1)
+        self.assertEqual(found['id'], self.article_id)
 
     def test_get_article_by_id_not_found(self):
         """
