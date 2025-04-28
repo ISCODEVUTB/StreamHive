@@ -30,8 +30,6 @@ class TestArticleController(unittest.TestCase):
             has_spoiler=False
         )
 
-        self.article_id = self.test_article.id
-
     def tearDown(self):
         """
         Remove the test file after each test run.
@@ -84,9 +82,9 @@ class TestArticleController(unittest.TestCase):
         Test retrieving an article by ID that exists.
         """
         self.controller.add(self.test_article)
-        found = self.controller.get_by_id(self.article_id)
+        found = self.controller.get_by_id(str(self.test_article.id))
         self.assertIsNotNone(found)
-        self.assertEqual(found['id'], self.article_id)
+        self.assertEqual(found['id'], str(self.test_article.id))
 
     def test_get_article_by_id_not_found(self):
         """

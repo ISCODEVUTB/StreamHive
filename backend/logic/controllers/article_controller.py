@@ -44,11 +44,12 @@ class ArticleController:
             return []
 
     def get_by_id(self, article_id: str):
+        print(article_id)
         try:
             with open(self.file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 for article in data:
-                    if article.get("id") == int (article_id):
+                    if article['id'] == article_id:
                         return article
         except Exception as e:
             print(f"Error al obtener articulo con su id '{article_id}': {e}")
