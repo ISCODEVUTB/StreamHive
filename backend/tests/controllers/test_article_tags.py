@@ -27,7 +27,7 @@ def test_create_newsletter(db: Session) -> None:
     newsletter = article_tags.create_newsletter(session=db, newsletter_create=newsletter_in)
 
     assert newsletter.newsletter_id is not None
-    assert newsletter.name == newsletter.name
+    assert newsletter.name == newsletter_in.name
 
 
 def test_get_section(db: Session) -> None:
