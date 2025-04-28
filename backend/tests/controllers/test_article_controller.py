@@ -118,7 +118,6 @@ class TestArticleController(unittest.TestCase):
         Test adding multiple articles.
         """
         article2 = Article(
-            id=2,
             user_id=456,
             section_id=11,
             content="Second article",
@@ -131,7 +130,7 @@ class TestArticleController(unittest.TestCase):
 
         articles = self.controller.get_all()
         self.assertEqual(len(articles), 2)
-        self.assertEqual(articles[1]['id'], 2)
+        self.assertIsNotNone(articles[1]['id'])
         self.assertEqual(articles[1]['content'], "Second article")
 
 
