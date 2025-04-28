@@ -71,15 +71,12 @@ def create_article(*, session: SessionDep, article_in: CreateArticle) -> Any:
     "/{article_id}",
     response_model=ArticlePublic,
 )
-def update_profile(
+def update_article(
     *,
     session: SessionDep,
     article_id: uuid.UUID,
     article_in: UpdateArticle,
 ) -> Any:
-    """
-    Update a user.
-    """
     db_article = session.get(Article, article_id)
     if not db_article:
         raise HTTPException(
@@ -95,7 +92,7 @@ def update_profile(
     "/{article_id}", 
 #    dependencies=[Depends(get_current_active_superuser)]
 )
-def delete_profile(
+def delete_article(
     session: SessionDep, 
 #    current_user: CurrentUser, 
     article_id: uuid.UUID
