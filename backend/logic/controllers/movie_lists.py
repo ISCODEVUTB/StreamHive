@@ -7,7 +7,7 @@ from backend.logic.models import MovieList
 from backend.logic.schemas.movie_lists import CreateMovieList, UpdateMovieList
 
 
-def create_movie_list(*, session: Session, movielist_create: CreateMovieList, profile_id: uuid.UUID) -> User:
+def create_movie_list(*, session: Session, movielist_create: CreateMovieList, profile_id: uuid.UUID) -> MovieList:
     db_obj = MovieList.model_validate(
         movielist_create, update={"profile_id": profile_id}
     )
