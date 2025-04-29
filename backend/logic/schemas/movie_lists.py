@@ -28,3 +28,4 @@ class MovieListsPublic(SQLModel):
 
 class ProfileMovieLists(ProfilePublic, MovieListsPublic):
     pass
+    
