@@ -15,7 +15,7 @@ class ProfileBase(SQLModel):
     """
     username: str = Field(max_length=20)
     description: str | None = Field(default=None, max_length=255)
-    profile_role: ProfileRoles = None
+    profile_role: ProfileRoles = ProfileRoles.SUBSCRIBER
 
 
 class CreateProfile(ProfileBase):
