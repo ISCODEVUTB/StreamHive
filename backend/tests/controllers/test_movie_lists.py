@@ -2,7 +2,7 @@ from fastapi.encoders import jsonable_encoder
 import pytest
 from sqlmodel import Session
 
-from backend.logic.models import User, Profile, MovieList
+from backend.logic.models import MovieList
 from backend.logic.controllers import users, profiles, movie_lists
 from backend.logic.schemas.users import CreateUser
 from backend.logic.schemas.profiles import CreateProfile
@@ -10,7 +10,7 @@ from backend.logic.schemas.movie_lists import CreateMovieList, UpdateMovieList
 from backend.tests.utils.utils import random_email, random_lower_string, random_birth_date
 
 
-def user_in() -> User:
+def user_in() -> CreateUser:
     return CreateUser(
         email=random_email(), 
         password =random_lower_string(),
@@ -21,13 +21,13 @@ def user_in() -> User:
     )
 
 
-def profile_in() -> Profile:
-    profile_in = CreateProfile(
+def profile_in() -> CreateProfile:
+    return CreateProfile(
         username=random_lower_string(),
     )
 
 
-def test_create_profile(db: Session) -> None:
+def test_create_movie_list(db: Session) -> None:
     user = users.create_user(session=db, user_create=user_in())
     profile = profiles.create_profile(session=db, profile_create=profile_in(), user_id=user.user_id)
     list_in = CreateMovieList(
@@ -40,7 +40,7 @@ def test_create_profile(db: Session) -> None:
     assert movie_list.name == list_in.name
 
 
-def test_get_profile(db: Session) -> None:
+def test_get_movie_list(db: Session) -> None:
     user = users.create_user(session=db, user_create=user_in())
     profile = profiles.create_profile(session=db, profile_create=profile_in(), user_id=user.user_id)
     list_in = CreateMovieList(
@@ -55,7 +55,7 @@ def test_get_profile(db: Session) -> None:
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
-def test_update_user(db: Session) -> None:
+def test_update_movie_list(db: Session) -> None:
     user = users.create_user(session=db, user_create=user_in())
     profile = profiles.create_profile(session=db, profile_create=profile_in(), user_id=user.user_id)
     list_in = CreateMovieList(
