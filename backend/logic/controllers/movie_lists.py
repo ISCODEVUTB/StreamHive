@@ -4,7 +4,7 @@ from typing import Any
 from sqlmodel import Session, select
 
 from backend.logic.models import MovieList
-from backend.logic.schemas.users import CreateMovieList, UpdateMovieList
+from backend.logic.schemas.movie_lists import CreateMovieList, UpdateMovieList
 
 
 def create_movie_list(*, session: Session, movielist_create: CreateMovieList, profile_id: uuid.UUID) -> User:
