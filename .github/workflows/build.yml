@@ -39,6 +39,12 @@ jobs:
           name: coverage-report
           path: coverage.xml
 
+      - name: Download coverage report
+        uses: actions/download-artifact@v2
+        with:
+          name: coverage-report
+          path: .
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         env:
