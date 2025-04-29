@@ -6,7 +6,7 @@ from backend.logic.schemas.profiles import ProfilePublic
 
 class MovieListBase(SQLModel):
     name: str
-    description: str | None
+    description: str | None = None
 
 
 class CreateMovieList(MovieListBase):
@@ -14,7 +14,7 @@ class CreateMovieList(MovieListBase):
 
 
 class UpdateMovieList(MovieListBase):
-    name: str | None
+    name: str | None = None
 
 
 class MovieListPublic(MovieListBase):

@@ -2,7 +2,7 @@ from fastapi.encoders import jsonable_encoder
 import pytest
 from sqlmodel import Session
 
-from backend.logic.models import Profile
+from backend.logic.models import User, Profile
 from backend.logic.enum import ProfileRoles
 from backend.logic.controllers import users, profiles
 from backend.logic.schemas.users import CreateUser
@@ -10,7 +10,7 @@ from backend.logic.schemas.profiles import CreateProfile, UpdateProfile
 from backend.tests.utils.utils import random_email, random_lower_string, random_birth_date
 
 
-def user_in():  
+def user_in() -> User:  
     return CreateUser(
         email=random_email(), 
         password =random_lower_string(),
