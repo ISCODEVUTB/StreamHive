@@ -16,7 +16,7 @@ from backend.logic.models import (
 
 from backend.logic.schemas.users import CreateUser
 from backend.logic.enum import UserTypes
-from backend.logic.controllers.users import create_user
+from backend.logic.controllers import users
 
 
 # RUTA ABSOLUTA A LA DB
@@ -43,4 +43,5 @@ def init_db(session: Session):
             birth_date='2005-09-15',
             gender='Masculin'
         )
+        user = users.create_user(session=session, user_create=user_in)
         
