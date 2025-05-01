@@ -48,6 +48,6 @@ jobs:
             -Dsonar.projectKey=ISCODEVUTB_StreamHive
             -Dsonar.organization=deviscoutb
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.python.coverage.reportPaths=backend/coverage.xml
+            -Dsonar.python.coverage.reportPaths=coverage.xml
             -Dsonar.exclusions=frontend/**
             -Dsonar.python.version=3.10
