@@ -5,7 +5,7 @@ from backend.logic.schemas.profiles import ProfilePublic
 
 
 class CreateFollow(SQLModel):
-    profile_id: uuid.UUID
+    follower_id: uuid.UUID
     following_id: uuid.UUID
 
 
