@@ -16,6 +16,6 @@ class MovieRating(SQLModel):
     rate: float
 
 
-class ProfileRatingsPublic(SQLModel):
+class MovieRatingsPublic(SQLModel):
     movie_id: str
     ratings: list[ProfileRating]
