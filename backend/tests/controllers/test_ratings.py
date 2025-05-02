@@ -10,8 +10,8 @@ from backend.logic.schemas.ratings import ProfileRatingsPublic, MovieRatingsPubl
 from backend.tests.utils.utils import random_email, random_lower_string, random_birth_date
 
 
-def user_and_profile_in(session: Session) -> CreateUser:  
-    user = users.create_user(session, user_create)={
+def user_and_profile_in(session: Session):  
+    user_create = {
         "email": random_email(),
         "password": random_lower_string(),
         "birth_date": random_birth_date(),
@@ -20,10 +20,14 @@ def user_and_profile_in(session: Session) -> CreateUser:
         "user_type": "external"
     }
 
-    profile = profiles.create_profile(session=session, profile_create={
+    user = users.create_user(session=session, user_create=user_create)
+
+    profile_create = {
         "username": random_lower_string(),
         "profile_role": ProfileRoles.SUBSCRIBER
-    }, user_id=user.user_id)
+    }
+
+    profile = profiles.create_profile(session=session, profile_create=profile_create, user_id=user.user_id)
 
     return user, profile
 
@@ -120,7 +124,7 @@ def test_delete_rating(db: Session):
 
     rating = db.exec(
         select(Rating).where(
-            Rating.profile_id == profile_id,
+            Rating.profile_id == profile.profile_id,
             Rating.movie_id == movie_id
         )
     ).first()
