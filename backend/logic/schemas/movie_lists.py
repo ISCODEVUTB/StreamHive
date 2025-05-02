@@ -7,6 +7,7 @@ from backend.logic.schemas.profiles import ProfilePublic
 class MovieListBase(SQLModel):
     name: str
     description: str | None = None
+    privacy: bool = False
 
 
 class CreateMovieList(MovieListBase):
@@ -15,10 +16,13 @@ class CreateMovieList(MovieListBase):
 
 class UpdateMovieList(MovieListBase):
     name: str | None = None
+    privacy: bool | None = None
 
 
 class MovieListPublic(MovieListBase):
     list_id: uuid.UUID
+    profile_id: uuid.UUID
+    movies: list | None = None
 
 
 class MovieListsPublic(SQLModel):
