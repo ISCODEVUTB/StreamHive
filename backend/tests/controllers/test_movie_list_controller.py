@@ -10,7 +10,8 @@ class TestMovieListController(unittest.TestCase):
 
     def setUp(self):
         self.example_id = str(uuid4())
-        self.user_id = str(uuid4())
+        self.profile_id = str(uuid4())
+
 
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([]))
@@ -20,13 +21,7 @@ class TestMovieListController(unittest.TestCase):
 
         new_movie_list = MovieList(
             id=str(uuid4()),
-            user_id=self.user_id,
-            privacy="private",
-            list_name="New Movie List",
-            list_description="A description made by the user of the movie list",
-            like_by=[1],
-            saved_by=[2],
-            movies=[104, 105]
+            profile_id=self.profile_id,
         )
 
         result = controller.add(new_movie_list)
@@ -36,37 +31,67 @@ class TestMovieListController(unittest.TestCase):
 
         args, _ = mock_json_dump.call_args
         dumped_data = args[0]
-        self.assertTrue(any(entry["list_name"] == "New Movie List" for entry in dumped_data))
         self.assertEqual(result, new_movie_list)
+
+    
+    @patch("os.path.exists", return_value=True)
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
+        "id": "some-id",
+        "profile_id": "some-user",
+        "movies": [101, 102, 103]
+    }]))
+    def test_remove_movie_list(self, mock_file, mock_exists):
+        controller = MovieListController()
+        result = controller.remove("some-id")
+
+        assert result is True
+
+        handle = mock_file()
+        written_data = "".join(call.args[0] for call in handle.write.call_args_list)
+        data = json.loads(written_data)
+        assert all(item["id"] != "some-id" for item in data)
+
+
+    @patch("os.path.exists", return_value=True)
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([
+        {
+            "id": "another-id",
+            "profile_id": "some-user",
+            "movies": [101, 102, 103]
+        }
+    ]))
+    def test_delete_movie_list_not_found(self, mock_file, mock_exists):
+        controller = MovieListController()
+        result = controller.remove("non-existent-id")
+
+        # Verifica que devuelve False
+        assert result is False
+
+        # No debería sobrescribir el archivo porque no se eliminó nada
+        handle = mock_file()
+        handle.truncate.assert_not_called()
+        handle.write.assert_not_called()
+
 
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
         "id": "some-id",
-        "user_id": "some-user",
-        "privacy": "private",
-        "list_name": "Favorites",
-        "list_description": "Your favorite movies in one place.",
-        "like_by": [1, 2],
-        "saved_by": [3],
+        "profile_id": "some-user",
         "movies": [101, 102, 103]
     }]))
     def test_get_all(self, mock_open_file, mock_exists):
         controller = MovieListController()
-        result = json.loads(controller.get_all())
+        result = controller.get_all()
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["list_name"], "Favorites")
+        self.assertEqual(result[0]["profile_id"], "some-user")
         self.assertGreaterEqual(mock_open_file.call_count, 1)
+
 
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
         "id": "some-id",
-        "user_id": "some-user",
-        "privacy": "private",
-        "list_name": "Favorites",
-        "list_description": "Your favorite movies in one place.",
-        "like_by": [1, 2],
-        "saved_by": [3],
+        "profile_id": "some-user",
         "movies": [101, 102, 103]
     }]))
     def test_get_movie_list_by_id(self, mock_open_file, mock_exists):
@@ -84,67 +109,90 @@ class TestMovieListController(unittest.TestCase):
         self.assertIsNone(result)
 
     @patch("os.path.exists", return_value=True)
+    @patch("json.dump")
     @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
         "id": "some-id",
-        "user_id": "some-user",
-        "privacy": "private",
-        "list_name": "Favorites",
-        "list_description": "Your favorite movies in one place.",
-        "like_by": [1, 2],
-        "saved_by": [3],
-        "movies": [101, 102, 103]
+        "profile_id": "some-user",
+        "movies": [{"movie_id": "101", "added_at": "2025-04-25T00:00:00"}]
     }]))
-    @patch("json.dump")
-    def test_update_movie_list(self, mock_json_dump, mock_open_file, mock_exists):
+    def test_add_movie(self, mock_open_file, mock_json_dump, mock_exists):
         controller = MovieListController()
-        updated_movie_list = MovieList(
-            id="some-id",
-            user_id="some-user",
-            privacy="private",
-            list_name="Updated List",
-            list_description="Updated description",
-            like_by=[2],
-            saved_by=[3],
-            movies=[200, 201]
-        )
 
-        result = controller.update("some-id", updated_movie_list)
+        # Simulando que la película que se va a agregar tiene el ID "102"
+        movie_id = "102"
+        movie_list_id = "some-id"
 
-        self.assertTrue(result)
-        self.assertGreaterEqual(mock_open_file.call_count, 1)
-        mock_json_dump.assert_called_once()
+        # Realizando la operación
+        exp = controller.add_movie(movie_list_id, movie_id)
+        self.assertTrue(exp)
+
+        # Verificando que la nueva película se haya agregado a la lista
+        written_data = mock_json_dump.call_args[0][0]
+        movie_list = next((m for m in written_data if m["id"] == movie_list_id), None)
+        self.assertIsNotNone(movie_list)
+        self.assertTrue(any(m["movie_id"] == movie_id for m in movie_list["movies"]))
+
+
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
+        "id": "some-id",
+        "profile_id": "some-user",
+        "movies": [{"movie_id": "101", "added_at": "2025-04-25T00:00:00"}]
+    }]))
+    def test_add_movie_exists(self, mock_file):
+        controller = MovieListController()
+
+        movie_id = "101"
+        movie_list_id = "some-id"
+
+        exp = controller.add_movie(movie_list_id, movie_id)
+
+        self.assertFalse(exp)
+        
 
     @patch("os.path.exists", return_value=True)
+    @patch("json.dump")
     @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
         "id": "some-id",
-        "user_id": "some-user",
-        "privacy": "private",
-        "list_name": "Favorites",
-        "list_description": "Your favorite movies in one place.",
-        "like_by": [1, 2],
-        "saved_by": [3],
-        "movies": [101, 102, 103]
+        "profile_id": "some-user",
+        "movies": [
+            {"movie_id": "101", "added_at": "2025-04-25T00:00:00"},
+            {"movie_id": "102", "added_at": "2025-04-26T00:00:00"}
+        ]
     }]))
-    @patch("json.dump")
-    def test_update_movie_list_not_found(self, mock_json_dump, mock_open_file, mock_exists):
+    def test_remove_movie(self, mock_open_file, mock_json_dump, mock_exists):
         controller = MovieListController()
-        non_existent_id = str(uuid4())
-        updated_movie_list = MovieList(
-            id=non_existent_id,
-            user_id=self.user_id,
-            privacy="private",
-            list_name="Should Not Update",
-            list_description="This shouldn't be saved",
-            like_by=[],
-            saved_by=[],
-            movies=[]
-        )
 
-        result = controller.update(non_existent_id, updated_movie_list)
+        # Simulando que la película que se va a eliminar tiene el ID "102"
+        movie_id = "102"
+        movie_list_id = "some-id"
 
-        self.assertFalse(result)
-        self.assertGreaterEqual(mock_open_file.call_count, 1)
-        mock_json_dump.assert_not_called()
+        # Realizando la operación
+        controller.remove_movie(movie_list_id, movie_id)
+
+        written_data = mock_json_dump.call_args[0][0]
+        movie_list = next((m for m in written_data if m["id"] == movie_list_id), None)
+        self.assertIsNotNone(movie_list)
+        self.assertFalse(any(m["movie_id"] == movie_id for m in movie_list["movies"]))
+
+
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
+        "id": "some-id",
+        "profile_id": "some-user",
+        "movies": [{"movie_id": "101", "added_at": "2025-04-25T00:00:00"}]
+    }]))
+    def test_remove_movie_not_found(self, mock_file):
+        controller = MovieListController()
+
+        # La película que se intenta eliminar no existe en la lista
+        movie_id = "999"
+        movie_list_id = "some-id"
+
+        # Realizando la operación
+        exp = controller.remove_movie(movie_list_id, movie_id)
+
+        # Verificando que no se haya modificado el archivo porque la película no existe
+        self.assertFalse(exp)
+
 
 if __name__ == '__main__':
     unittest.main()

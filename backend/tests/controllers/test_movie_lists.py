@@ -10,8 +10,8 @@ from backend.logic.schemas.movie_lists import CreateMovieList, UpdateMovieList
 from backend.tests.utils.utils import random_email, random_lower_string, random_birth_date
 
 
-def user_in() -> CreateUser:
-    return CreateUser(
+def user_and_profile_in(session: Session):  
+    user_create = CreateUser(
         email=random_email(), 
         password =random_lower_string(),
         birth_date=random_birth_date(),
@@ -20,16 +20,19 @@ def user_in() -> CreateUser:
         user_type="external"
     )
 
+    user = users.create_user(session=session, user_create=user_create)
 
-def profile_in() -> CreateProfile:
-    return CreateProfile(
-        username=random_lower_string(),
+    profile_create = CreateProfile(
+        username=random_lower_string()
     )
+
+    profile = profiles.create_profile(session=session, profile_create=profile_create, user_id=user.user_id)
+
+    return user, profile
 
 
 def test_create_movie_list(db: Session) -> None:
-    user = users.create_user(session=db, user_create=user_in())
-    profile = profiles.create_profile(session=db, profile_create=profile_in(), user_id=user.user_id)
+    _, profile = user_and_profile_in(db)
     list_in = CreateMovieList(
         name=random_lower_string()
     )
@@ -41,8 +44,7 @@ def test_create_movie_list(db: Session) -> None:
 
 
 def test_get_movie_list(db: Session) -> None:
-    user = users.create_user(session=db, user_create=user_in())
-    profile = profiles.create_profile(session=db, profile_create=profile_in(), user_id=user.user_id)
+    _, profile = user_and_profile_in(db)
     list_in = CreateMovieList(
         name=random_lower_string()
     )
@@ -56,8 +58,7 @@ def test_get_movie_list(db: Session) -> None:
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_update_movie_list(db: Session) -> None:
-    user = users.create_user(session=db, user_create=user_in())
-    profile = profiles.create_profile(session=db, profile_create=profile_in(), user_id=user.user_id)
+    _, profile = user_and_profile_in(db)
     list_in = CreateMovieList(
         name=random_lower_string()
     )

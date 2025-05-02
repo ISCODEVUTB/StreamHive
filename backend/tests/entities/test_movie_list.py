@@ -1,4 +1,5 @@
 import unittest
+from uuid import uuid4
 from backend.logic.entities.movie_list import MovieList
 
 
@@ -14,15 +15,12 @@ class TestMovieList(unittest.TestCase):
         """
         Set up a MovieList object to use in the test case.
         """
+        self.example_id = str(uuid4())
+        self.profile_id = str(uuid4())
+
         self.movie_list = MovieList(
-            id=None,
-            user_id=10,
-            privacy="public",
-            list_name="Top Movies 2025",
-            list_description="A list of my favorite movies from 2025",
-            like_by=[2, 3],
-            saved_by=[4, 5],
-            movies=[1001, 1002, 1003]
+            id=self.example_id,
+            profile_id=self.profile_id
         )
 
     def test_movie_list_initialization(self):
@@ -31,55 +29,10 @@ class TestMovieList(unittest.TestCase):
 
         Verifies if all attributes of the MovieList object are correctly set during initialization.
         """
-        self.assertIsInstance(self.movie_list.id, str, "The ID should be a string.")
-        self.assertEqual(self.movie_list.user_id, 10, "The user_id was not initialized correctly.")
-        self.assertEqual(self.movie_list.privacy, "public", "The privacy setting was not initialized correctly.")
-        self.assertEqual(self.movie_list.list_name, "Top Movies 2025", "The list_name was not initialized correctly.")
-        self.assertEqual(self.movie_list.list_description, "A list of my favorite movies from 2025", "The list_description was not initialized correctly.")
-        self.assertEqual(self.movie_list.like_by, [2, 3], "The like_by list was not initialized correctly.")
-        self.assertEqual(self.movie_list.saved_by, [4, 5], "The saved_by list was not initialized correctly.")
-        self.assertEqual(self.movie_list.movies, [1001, 1002, 1003], "The movies list was not initialized correctly.")
+        self.assertEqual(self.movie_list.id, self.example_id, "The ID should be a string.")
+        self.assertEqual(self.movie_list.profile_id, self.profile_id, "The profile_ID was not initialized correctly.")
+        self.assertIsNotNone(self.movie_list.movies, "The movies list was not initialized correctly.")
 
-    def test_setters_and_getters(self):
-        """
-        Verify all setters and getters are working.
-        """
-        self.movie_list.user_id = 20
-        self.movie_list.privacy = "private"
-        self.movie_list.list_name = "Sci-fi Hits"
-        self.movie_list.list_description = "Best sci-fi films ever"
-        self.movie_list.like_by = [1, 4]
-        self.movie_list.saved_by = [6]
-        self.movie_list.movies = [2001, 2002]
-
-        self.assertEqual(self.movie_list.user_id, 20)
-        self.assertEqual(self.movie_list.privacy, "private")
-        self.assertEqual(self.movie_list.list_name, "Sci-fi Hits")
-        self.assertEqual(self.movie_list.list_description, "Best sci-fi films ever")
-        self.assertEqual(self.movie_list.like_by, [1, 4])
-        self.assertEqual(self.movie_list.saved_by, [6])
-        self.assertEqual(self.movie_list.movies, [2001, 2002])
-
-    def test_list_name_length_validation(self):
-        """
-        Test the validation of list name length.
-        """
-        with self.assertRaises(ValueError):
-            self.movie_list.list_name = "A" * 201  # Exceeds max length of 200 characters
-
-    def test_list_description_length_validation(self):
-        """
-        Test the validation of list description length.
-        """
-        with self.assertRaises(ValueError):
-            self.movie_list.list_description = "A" * 1001  # Exceeds max length of 1000 characters
-
-    def test_privacy_validation(self):
-        """
-        Test the validation of privacy setting.
-        """
-        with self.assertRaises(ValueError):
-            self.movie_list.privacy = "restricted"  # Invalid privacy setting
 
 if __name__ == "__main__":
     unittest.main()

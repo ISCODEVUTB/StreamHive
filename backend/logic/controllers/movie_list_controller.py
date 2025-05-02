@@ -1,9 +1,13 @@
 import json
 import os
+
+from datetime import datetime, timezone
+
 from backend.logic.entities.movie_list import MovieList
 
-PATH = os.getcwd()
-DIR_DATA = os.path.join(PATH, 'data')
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+DIR_DATA = os.path.join(CURRENT_DIR, '..', '..', 'data')
+DIR_DATA = os.path.abspath(DIR_DATA)
 
 
 class MovieListController(object):
@@ -19,7 +23,10 @@ class MovieListController(object):
         Add a new movie list to the storage.
         """
         with open(self.file, 'r+', encoding='utf-8') as f:
-            data = json.load(f)
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                data = []
             data.append(new_movie_list.to_dict())
             f.seek(0)
             json.dump(data, f, indent=4)
@@ -33,8 +40,7 @@ class MovieListController(object):
         with open(self.file, 'r', encoding='utf-8') as openfile:
             # Reading from json file
             data = json.load(openfile)
-            data_str = json.dumps(data)
-        return data_str
+        return data
 
     def get_by_id(self, movie_list_id: str):
         """
@@ -46,29 +52,78 @@ class MovieListController(object):
                 if movie_list.get("id") == movie_list_id:
                     return movie_list
         return None
-
-    def update(self, movie_list_id: str, updated_movie_list: MovieList) -> bool:
-        """
-        Update an existing movie list.
-        
-        Args:
-            movie_list_id: The ID of the movie list to update.
-            updated_movie_list: A MovieList object with updated information.
-        
-        Returns:
-            bool: True if the update was successful, False otherwise.
-        """
-        with open(self.file, 'r+', encoding='utf-8') as f:
+    
+    def remove(self, movie_list_id: str) -> bool:
+        with open(self.file, "r+", encoding="utf-8") as f:
             data = json.load(f)
-            
-            # Search for the index of the movie list
-            for index, movie_list in enumerate(data):
-                # Search the movie list by its id
-                if movie_list.get("id") == movie_list_id:
-                    # Update the movie list in the position found
-                    data[index] = updated_movie_list.to_dict()  # Change the dictionary for the updated one
-                    f.seek(0)
-                    json.dump(data, f, indent=4)  # Save the changes made
-                    return True  # Updated done successfully
+
+            # Buscar directamente en data
         
-        return False  # Movie list not found
+            new_movies_list = [m for m in data if m["id"] != movie_list_id]
+
+            if len(data) == len(new_movies_list):
+                print("Movie list not found.")
+                return False
+
+            data = new_movies_list
+
+            # Guardar cambios
+            f.seek(0)
+            f.truncate()
+            json.dump(data, f, indent=4)
+            f.flush()
+            return True
+        
+
+    def add_movie(self, movie_list_id: str, movie_id: str) -> bool:
+        with open(self.file, "r+", encoding="utf-8") as f:
+            data = json.load(f)
+
+            # Buscar la lista directamente en data
+            for movie_list in data:
+                if movie_list["id"] == movie_list_id:
+                    if any(str(m["movie_id"]) == str(movie_id) for m in movie_list.get("movies", [])):
+                        print("Movie already in list.")
+                        return False
+
+                    movie_list.setdefault("movies", []).append({
+                        "movie_id": movie_id,
+                        "added_at": datetime.now(timezone.utc).isoformat()
+                    })
+
+                    # Guardar cambios
+                    f.seek(0)
+                    f.truncate()
+                    json.dump(data, f, indent=4)
+                    f.flush()
+                    return True
+
+            print("Movie list not found.")
+            return False
+    
+
+    def remove_movie(self, movie_list_id: str, movie_id: str) -> bool:
+        with open(self.file, "r+", encoding="utf-8") as f:
+            data = json.load(f)
+
+            # Buscar directamente en data
+            for movie_list in data:
+                if movie_list["id"] == movie_list_id:
+                    movies = movie_list.get("movies", [])
+                    new_movies = [m for m in movies if m["movie_id"] != movie_id]
+
+                    if len(movies) == len(new_movies):
+                        print("Movie not found in list.")
+                        return False
+
+                    movie_list["movies"] = new_movies
+
+                    # Guardar cambios
+                    f.seek(0)
+                    f.truncate()
+                    json.dump(data, f, indent=4)
+                    f.flush()
+                    return True
+
+            print("Movie list not found.")
+            return False
