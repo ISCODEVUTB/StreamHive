@@ -81,14 +81,16 @@ def get_ratings_by_movie_id(
     Returns:
         MovieRatingsPublic: A collection of profiles with ratings for the specified movie.
     """
-    rating = session.exec(select(Rating).where(Rating.movie_id == movie_id))
-    if not rating:
-        return MovieRatingsPublic(movie_id=movie_id, ratings=[])
-    
-    result_list = []
-    for r in rating:
-        profile = session.exec(select(Profile).where(Profile.profile_id == r.profile_id)).first()
-        if profile:
-            result_list.append(MovieRating(username=profile.username, rate=r.rate))
+    rating = (
+        select(Rating, Profile.username)
+        .join(Profile, Profile.profile_id == Rating.profile_id)
+        .where(Rating.movie_id == movie_id)
+    )
 
-    return MovieRatingsPublic(movie_id=movie_id, ratings=result_list)
+    ratings = list(session.exec(rating))
+    ratings_list = [
+        MovieRating(username=username, rate=rating.rate)
+        for rating, username in ratings
+    ]
+
+    return MovieRatingsPublic(movie_id=movie_id, ratings=ratings_list)

@@ -18,4 +18,5 @@ class MovieRating(SQLModel):
 
 class MovieRatingsPublic(SQLModel):
     movie_id: str
-    ratings: list[ProfileRating]
+    ratings: list[MovieRating]
+    

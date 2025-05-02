@@ -80,6 +80,7 @@ def test_get_rating_by_movie_id(db: Session) -> None:
     assert isinstance(rating, MovieRatingsPublic)
     assert rating.movie_id == movie_id
     assert len(rating.ratings) == 1
+    assert rating.ratings[0].username == profile.username
     assert rating.ratings[0].rate == rate
 
 
