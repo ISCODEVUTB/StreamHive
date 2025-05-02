@@ -26,7 +26,7 @@ def create_follow(
     Returns:
         Follow: The created follow relationship.
     """
-    db_obj = Follow.model_validate(
+    db_obj = Follow(
         follower_id=follow_create.follower_id,
         following_id=follow_create.following_id
     )
@@ -93,7 +93,7 @@ def get_profile_following(*, session: Session, profile_id: uuid) -> FollowingPub
     followings = session.exec(query).all()
     following_list = [ProfilePublic.model_validate(f) for f in followings]
 
-    return FollowersPublic(
+    return FollowingPublic(
         **ProfilePublic.model_validate(profile).model_dump(),
         followers=following_list,
         count=len(following_list)
