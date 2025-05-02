@@ -4,30 +4,35 @@ from sqlmodel import Session
 from sqlmodel import func, select
 
 from backend.logic.models import Rating
-from backend.logic.enum import ProfileRoles
+from backend.logic.enum import ProfileRoles, UserTypes
 from backend.logic.controllers import users, profiles, ratings
 from backend.logic.schemas.ratings import ProfileRatingsPublic, MovieRatingsPublic
+from backend.logic.schemas.users import CreateUser
+from backend.logic.schemas.profiles import CreateProfile
 from backend.tests.utils.utils import random_email, random_lower_string, random_birth_date
 
+full_name='User Example'
+gender="Other"
+user_type=UserTypes.EXTERNAL
 
-def user_and_profile_in(session: Session):  
-    user_create = {
-        "email": random_email(),
-        "password": random_lower_string(),
-        "birth_date": random_birth_date(),
-        "full_name": 'User Example',
-        "gender": "Other",
-        "user_type": "external"
-    }
 
-    user = users.create_user(session=session, user_create=user_create)
+def user_and_profile_in(db: Session):  
+    user_in = CreateUser(
+        full_name=full_name,
+        email=random_email(), 
+        password =random_lower_string(),
+        birth_date=random_birth_date(),
+        gender=gender,
+        user_type=user_type
+    )
+    
+    user = users.create_user(session=db, user_create=user_in)
 
-    profile_create = {
-        "username": random_lower_string(),
-        "profile_role": ProfileRoles.SUBSCRIBER
-    }
-
-    profile = profiles.create_profile(session=session, profile_create=profile_create, user_id=user.user_id)
+    profile_in = CreateProfile(
+        username=random_lower_string(),
+        profile_role=ProfileRoles.SUBSCRIBER
+    )
+    profile = profiles.create_profile(session=db, profile_create=profile_in, user_id=user.user_id)
 
     return user, profile
 
@@ -36,7 +41,7 @@ def test_create_rating(db: Session) -> None:
     _, profile = user_and_profile_in(db)
     movie_id = "movie-rom-123"
     rate = 4.5
-
+    
     rating = ratings.create_or_update_rating(
          session=db, profile_id=profile.profile_id, movie_id=movie_id, rate=rate
     )
