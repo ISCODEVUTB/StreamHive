@@ -33,6 +33,45 @@ class TestMovieListController(unittest.TestCase):
         dumped_data = args[0]
         self.assertEqual(result, new_movie_list)
 
+    
+    @patch("os.path.exists", return_value=True)
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
+        "id": "some-id",
+        "profile_id": "some-user",
+        "movies": [101, 102, 103]
+    }]))
+    def test_remove_movie_list(self, mock_file, mock_exists):
+        controller = MovieListController()
+        result = controller.remove("some-id")
+
+        assert result is True
+
+        handle = mock_file()
+        written_data = "".join(call.args[0] for call in handle.write.call_args_list)
+        data = json.loads(written_data)
+        assert all(item["id"] != "some-id" for item in data)
+
+
+    @patch("os.path.exists", return_value=True)
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([
+        {
+            "id": "another-id",
+            "profile_id": "some-user",
+            "movies": [101, 102, 103]
+        }
+    ]))
+    def test_delete_movie_list_not_found(self, mock_file, mock_exists):
+        controller = MovieListController()
+        result = controller.remove("non-existent-id")
+
+        # Verifica que devuelve False
+        assert result is False
+
+        # No debería sobrescribir el archivo porque no se eliminó nada
+        handle = mock_file()
+        handle.truncate.assert_not_called()
+        handle.write.assert_not_called()
+
 
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
