@@ -1,4 +1,3 @@
-from fastapi.encoders import jsonable_encoder
 import pytest
 from sqlmodel import Session
 from sqlmodel import func, select
@@ -37,7 +36,7 @@ def user_and_profile_in(db: Session):
     return user, profile
 
 
-def test_create_rating(db: Session) -> None:
+def test_create_or_update_rating(db: Session) -> None:
     _, profile = user_and_profile_in(db)
     movie_id = "movie-rom-123"
     rate = 4.5
@@ -67,6 +66,16 @@ def test_get_rating_by_username(db: Session) -> None:
     assert rating.ratings[0].movie_id == movie_id
 
 
+def test_get_rating_by_nonexistent_username(db: Session) -> None:
+    non_existent = "dontExist"
+
+    rating = ratings.get_ratings_by_username(session=db, username=non_existent)
+
+    assert isinstance(rating, ProfileRatingsPublic)
+    assert rating.username == non_existent
+    assert len(rating.ratings) == 0
+
+
 def test_get_rating_by_movie_id(db: Session) -> None:
     _, profile = user_and_profile_in(db)
     movie_id = "movie-horr-789"
@@ -82,6 +91,16 @@ def test_get_rating_by_movie_id(db: Session) -> None:
     assert len(rating.ratings) == 1
     assert rating.ratings[0].username == profile.username
     assert rating.ratings[0].rate == rate
+
+
+def test_get_rating_by_movie_id_no_ratings(db: Session) -> None:
+    movie_id = "movie-0-ratings"
+
+    rating = ratings.get_ratings_by_movie_id(session=db, movie_id=movie_id)
+
+    assert isinstance(rating, MovieRatingsPublic)
+    assert rating.movie_id == movie_id
+    assert len(rating.ratings) == 0
 
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
