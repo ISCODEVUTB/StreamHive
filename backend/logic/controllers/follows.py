@@ -50,7 +50,7 @@ def get_profile_followers(*, session: Session, profile_id: uuid) -> FollowersPub
     profile = session.exec(select(Profile).where(Profile.profile_id == profile_id)).first()
 
     if not profile:
-        return FollowersPublic(**{}, followers=[], count=0)  # Or raise exception if preferred
+        return FollowersPublic(followers=[], count=0)  # Or raise exception if preferred
 
     query = (
         select(Profile)
@@ -82,7 +82,7 @@ def get_profile_following(*, session: Session, profile_id: uuid) -> FollowingPub
     profile = session.exec(select(Profile).where(Profile.profile_id == profile_id)).first()
 
     if not profile:
-        return FollowersPublic(**{}, following=[], count=0)  # Or raise exception if preferred
+        return FollowingPublic(following=[], count=0)
 
     query = (
         select(Profile)
@@ -95,6 +95,6 @@ def get_profile_following(*, session: Session, profile_id: uuid) -> FollowingPub
 
     return FollowingPublic(
         **ProfilePublic.model_validate(profile).model_dump(),
-        followers=following_list,
+        following=following_list,
         count=len(following_list)
     )

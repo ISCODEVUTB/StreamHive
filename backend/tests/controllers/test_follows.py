@@ -62,6 +62,15 @@ def test_get_profile_followers(db: Session) -> None:
     assert followers.followers[0].profile_id == profile1.profile_id
 
 
+def test_get_profile_followers_empty(db: Session) -> None:
+    profile2 = create_test_profile(db)
+
+    followers = follows.get_profile_followers(session=db, profile_id=profile2.profile_id)
+
+    assert followers.count == 0
+    assert followers.followers == []
+
+
 def test_get_profile_following(db: Session) -> None:
     profile1 = create_test_profile(db)
     profile2 = create_test_profile(db)
@@ -73,3 +82,12 @@ def test_get_profile_following(db: Session) -> None:
 
     assert following.count == 1
     assert following.following[0].profile_id == profile2.profile_id
+
+
+def test_get_profile_following_empty(db: Session) -> None:
+    profile1 = create_test_profile(db)
+
+    following = follows.get_profile_following(session=db, profile_id=profile1.profile_id)
+
+    assert following.count == 0
+    assert following.following == []
