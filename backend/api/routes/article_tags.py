@@ -163,3 +163,4 @@ def delete_newsletter(
     
     session.delete(db_newsletter)
     session.commit()
+    

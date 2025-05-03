@@ -9,6 +9,7 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 DIR_DATA = os.path.join(CURRENT_DIR, '..', '..', 'data')
 DIR_DATA = os.path.abspath(DIR_DATA)
 
+message_404 = "Movie list not found"
 
 class MovieListController(object):
 
@@ -62,7 +63,7 @@ class MovieListController(object):
             new_movies_list = [m for m in data if m["id"] != movie_list_id]
 
             if len(data) == len(new_movies_list):
-                print("Movie list not found.")
+                print(message_404)
                 return False
 
             data = new_movies_list
@@ -98,7 +99,7 @@ class MovieListController(object):
                     f.flush()
                     return True
 
-            print("Movie list not found.")
+            print(message_404)
             return False
     
 
@@ -125,5 +126,5 @@ class MovieListController(object):
                     f.flush()
                     return True
 
-            print("Movie list not found.")
+            print(message_404)
             return False

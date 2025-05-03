@@ -7,7 +7,8 @@ from backend.api.routes import (
     articles,
     article_tags,
     movie_lists,
-    ratings
+    ratings,
+    follows
 )
 
 api_router = APIRouter()
@@ -18,3 +19,4 @@ api_router.include_router(articles.router)
 api_router.include_router(article_tags.router)
 api_router.include_router(movie_lists.router)
 api_router.include_router(ratings.router)
+api_router.include_router(follows.router)

@@ -121,3 +121,4 @@ def delete_profile(
     
     session.delete(db_profile)
     session.commit()
+    

@@ -91,3 +91,4 @@ def test_get_profile_following_empty(db: Session) -> None:
 
     assert following.count == 0
     assert following.following == []
+    

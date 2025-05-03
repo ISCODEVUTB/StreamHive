@@ -106,3 +106,4 @@ def delete_article(
     
     session.delete(db_article)
     session.commit()
+    
