@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, Annotated
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
@@ -15,8 +15,8 @@ from backend.logic.schemas.profiles import (
     ProfilesPublic,
     ProfilePublicEXT
 )
-from backend.logic.controllers import profiles, profile_controller
-from backend.api.deps import SessionDep
+from backend.logic.controllers import profiles
+from backend.api.deps import CurrentUser, SessionDep
 
 
 router = APIRouter(prefix="/profiles", tags=["profiles"])
@@ -36,20 +36,11 @@ def read_profiles(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
     return ProfilesPublic(profiles=profiles, count=count)
 
 
-@router.get("/{profile_id}", response_model=ProfilePublic)
-def read_profile_by_id(
-    profile_id: uuid.UUID, 
-    session: SessionDep,
-) -> Any:
-    profile = session.get(Profile, profile_id)
-    return profile
-
-
 @router.post(
-    "/", 
+    "/",
     response_model=ProfilePublic
 )
-def create_profile(*, session: SessionDep, profile_in: CreateProfile, user_in: uuid.UUID) -> Any:
+def create_profile(*, session: SessionDep, profile_in: CreateProfile, current_user: CurrentUser) -> Any:
     profile = profiles.get_profile_by_username(session=session, username=profile_in.username)
     if profile:
         raise HTTPException(
@@ -57,24 +48,36 @@ def create_profile(*, session: SessionDep, profile_in: CreateProfile, user_in: u
             detail="The profile with this username already exists in the system.",
         )
     
-    profile = profiles.create_profile(session=session, profile_create=profile_in, user_id=user_in)
+    profile = profiles.create_profile(session=session, profile_create=profile_in, user_id=current_user.user_id)
+    return profile
+
+
+@router.get("/my-profile", response_model=ProfilePublic)
+def read_profile_by_user( 
+    session: SessionDep,
+    current_user: CurrentUser
+) -> Any:
+    statement = select(Profile).where(Profile.user_id == current_user.user_id)
+    profile = session.exec(statement).first()
+    print(profile)
     return profile
 
 
 @router.patch(
-    "/{profile_id}",
+    "/update",
     response_model=ProfilePublic,
 )
 def update_profile(
     *,
     session: SessionDep,
-    profile_id: uuid.UUID,
     profile_in: UpdateProfile,
+    current_user: CurrentUser
 ) -> Any:
     """
     Update a user.
     """
-    db_profile = session.get(Profile, profile_id)
+    statement = select(Profile).where(Profile.user_id == current_user.user_id)
+    db_profile = session.exec(statement).first()
     if not db_profile:
         raise HTTPException(
             status_code=404,
@@ -82,13 +85,22 @@ def update_profile(
         )
     if profile_in.username:
         existing_profile = profiles.get_profile_by_username(session=session, username=profile_in.username)
-        if existing_profile and existing_profile.profile_id != profile_id:
+        if existing_profile and existing_profile.profile_id != db_profile.profile_id:
             raise HTTPException(
                 status_code=409, detail="Profile with this username already exists"
             )
 
     db_profile = profiles.update_profile(session=session, db_profile=db_profile, profile_in=profile_in)
     return db_profile
+
+
+@router.get("/{profile_id}", response_model=ProfilePublic)
+def read_profile_by_id(
+    profile_id: uuid.UUID, 
+    session: SessionDep,
+) -> Any:
+    profile = session.get(Profile, profile_id)
+    return profile
 
 
 @router.delete(

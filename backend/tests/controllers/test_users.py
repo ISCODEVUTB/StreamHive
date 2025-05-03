@@ -125,4 +125,38 @@ def test_update_user(db: Session) -> None:
     assert user.email == user_2.email
     assert user_2.full_name == new_fullname
     assert verify_password(new_password, user_2.hashed_password)
-    
+
+
+def test_user_authentification(db: Session) -> None:
+    user_in = CreateUser(
+        full_name=full_name,
+        email=random_email(), 
+        password =random_lower_string(),
+        birth_date=random_birth_date(),
+        gender=gender,
+        user_type=user_type
+    )
+    user = users.create_user(session=db, user_create=user_in)
+
+    user_auth = users.authenticate(session=db, email=user_in.email, password=user_in.password)
+
+    assert user
+    assert user_auth
+
+
+def test_failed_user_authentification(db: Session) -> None:
+    user_in = CreateUser(
+        full_name=full_name,
+        email=random_email(), 
+        password =random_lower_string(),
+        birth_date=random_birth_date(),
+        gender=gender,
+        user_type=user_type
+    )
+    user = users.create_user(session=db, user_create=user_in)
+
+    wrong_password = random_lower_string() 
+    user_auth = users.authenticate(session=db, email=user_in.email, password=wrong_password)
+
+    assert user
+    assert user_auth is None
