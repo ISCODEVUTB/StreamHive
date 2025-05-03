@@ -82,36 +82,3 @@ def update_newsletter(*, session: Session, db_tag: Newsletter, tag_in: UpdateTag
     session.commit()
     session.refresh(db_tag)
     return db_tag
-
-
-def get_section_by_name(*, session: Session, name: str) -> Section | None:
-    """
-    Retrieve a Section by its name.
-
-    Args:
-        session (Session): Active SQLModel database session.
-        name (str): The name of the section to search for.
-
-    Returns:
-        Section | None: The found Section object if it exists, otherwise None.
-    """
-    statement = select(Section).where(Section.name == name)
-    session_section = session.exec(statement).first()
-    return session_section
-
-
-def get_newsletter_by_name(*, session: Session, name: str) -> Newsletter | None:
-    """
-    Retrieve a Newsletter by its name.
-
-    Args:
-        session (Session): Active SQLModel database session.
-        name (str): The name of the newsletter to search for.
-
-    Returns:
-        Newsletter | None: The found Newsletter object if it exists, otherwise None.
-    """
-    statement = select(Newsletter).where(Newsletter.name == name)
-    session_newsletter = session.exec(statement).first()
-    return session_newsletter
-

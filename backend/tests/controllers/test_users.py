@@ -144,7 +144,7 @@ def test_user_authentification(db: Session) -> None:
     assert user_auth
 
 
-def test_failed_user_authentification(db: Session) -> None:
+def test_failed_user_authentification_password(db: Session) -> None:
     user_in = CreateUser(
         full_name=full_name,
         email=random_email(), 
@@ -157,6 +157,24 @@ def test_failed_user_authentification(db: Session) -> None:
 
     wrong_password = random_lower_string() 
     user_auth = users.authenticate(session=db, email=user_in.email, password=wrong_password)
+
+    assert user
+    assert user_auth is None
+
+
+def test_failed_user_authentification_email(db: Session) -> None:
+    user_in = CreateUser(
+        full_name=full_name,
+        email=random_email(), 
+        password =random_lower_string(),
+        birth_date=random_birth_date(),
+        gender=gender,
+        user_type=user_type
+    )
+    user = users.create_user(session=db, user_create=user_in)
+
+    wrong_email = random_email() 
+    user_auth = users.authenticate(session=db, email=wrong_email, password=user_in.password)
 
     assert user
     assert user_auth is None

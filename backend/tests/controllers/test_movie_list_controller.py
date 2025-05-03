@@ -138,6 +138,22 @@ class TestMovieListController(unittest.TestCase):
         "profile_id": "some-user",
         "movies": [{"movie_id": "101", "added_at": "2025-04-25T00:00:00"}]
     }]))
+    def test_add_list_not_found(self, mock_file):
+        controller = MovieListController()
+
+        movie_id = "101"
+        movie_list_id = "another-id"
+
+        exp = controller.add_movie(movie_list_id, movie_id)
+
+        self.assertFalse(exp)
+
+
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
+        "id": "some-id",
+        "profile_id": "some-user",
+        "movies": [{"movie_id": "101", "added_at": "2025-04-25T00:00:00"}]
+    }]))
     def test_add_movie_exists(self, mock_file):
         controller = MovieListController()
 
@@ -180,6 +196,25 @@ class TestMovieListController(unittest.TestCase):
         "profile_id": "some-user",
         "movies": [{"movie_id": "101", "added_at": "2025-04-25T00:00:00"}]
     }]))
+    def test_remove_list_not_found(self, mock_file):
+        controller = MovieListController()
+
+        # La película que se intenta eliminar no existe en la lista
+        movie_id = "999"
+        movie_list_id = "another-id"
+
+        # Realizando la operación
+        exp = controller.remove_movie(movie_list_id, movie_id)
+
+        # Verificando que no se haya modificado el archivo porque la película no existe
+        self.assertFalse(exp)
+
+
+    @patch("builtins.open", new_callable=mock_open, read_data=json.dumps([{
+        "id": "some-id",
+        "profile_id": "some-user",
+        "movies": [{"movie_id": "101", "added_at": "2025-04-25T00:00:00"}]
+    }]))
     def test_remove_movie_not_found(self, mock_file):
         controller = MovieListController()
 
@@ -196,4 +231,3 @@ class TestMovieListController(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    

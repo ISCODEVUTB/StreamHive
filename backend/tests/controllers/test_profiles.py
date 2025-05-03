@@ -96,7 +96,8 @@ def test_update_profile(db: Session) -> None:
         username=new_username
     )
     
-    if profile.profile_id is not None:
+    db_profile = profiles.get_profile_by_username(session=db, username=new_username)
+    if profile.profile_id is not None and not db_profile:
         profiles.update_profile(session=db, db_profile=profile, profile_in=profile_in_update)
     profile_2 = db.get(Profile, profile.profile_id)
     

@@ -15,9 +15,6 @@ class MovieListController(object):
 
     def __init__(self):
         self.file = os.path.join(DIR_DATA, 'storage_movie_lists.json')
-        if not os.path.exists(self.file):
-            with open(self.file, 'w', encoding='utf-8') as f:
-                json.dump([], f)
 
     def add(self, new_movie_list: MovieList) -> MovieList:
         """
