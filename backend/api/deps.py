@@ -10,6 +10,7 @@ from jwt.exceptions import PyJWTError
 from pydantic import ValidationError
 from sqlmodel import Session
 
+from backend.core.config import settings
 from backend.core import security
 from backend.core.db import engine
 from backend.api.schemas import TokenPayload
@@ -18,7 +19,7 @@ from backend.logic.enum import UserTypes, UserStatus
 
 
 reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"/api/v1/login/access-token"
+    tokenUrl=f"{settings.API_V1_STR}/login/access-token"
 )
 
 

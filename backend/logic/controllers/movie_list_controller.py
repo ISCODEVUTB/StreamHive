@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from backend.logic.entities.movie_list import MovieList
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-DIR_DATA = os.path.join(CURRENT_DIR, '..', '..', 'data')
+DIR_DATA = os.path.join(CURRENT_DIR, '..', '..', 'data', 'json')
 DIR_DATA = os.path.abspath(DIR_DATA)
 
 message_404 = "Movie list not found"

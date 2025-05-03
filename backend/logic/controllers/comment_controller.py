@@ -2,8 +2,9 @@ import json
 import os
 from backend.logic.entities.comment import Comment
 
-PATH = os.getcwd()
-DIR_DATA = os.path.join(PATH, 'backend', 'data')
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+DIR_DATA = os.path.join(CURRENT_DIR, '..', '..', 'data', 'json')
+DIR_DATA = os.path.abspath(DIR_DATA)
 
 
 class CommentController:

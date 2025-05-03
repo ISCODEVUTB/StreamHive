@@ -21,7 +21,6 @@ from backend.logic.controllers import users
 
 # RUTA ABSOLUTA A LA DB
 BASE_DIR = Path(__file__).resolve().parent.parent
-print(BASE_DIR)
 DB_PATH = BASE_DIR / "data" / "thehive.db"
 
 DATABASE_URL = f"sqlite:///{DB_PATH}"
