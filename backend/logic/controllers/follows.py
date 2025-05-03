@@ -36,7 +36,7 @@ def create_follow(
     return db_obj
 
 
-def get_profile_followers(*, session: Session, profile_id: uuid) -> FollowersPublic:
+def get_profile_followers(*, session: Session, profile_id: uuid) -> FollowersPublic | None:
     """
     Retrieve all followers of a specific profile.
 
@@ -47,10 +47,10 @@ def get_profile_followers(*, session: Session, profile_id: uuid) -> FollowersPub
     Returns:
         FollowersPublic: A list of follower profiles and the count.
     """
-    profile = session.exec(select(Profile).where(Profile.profile_id == profile_id)).first()
+    profile = session.get(Profile, profile_id)
 
     if not profile:
-        return FollowersPublic(followers=[], count=0)  # Or raise exception if preferred
+        return None
 
     query = (
         select(Profile)
@@ -68,7 +68,7 @@ def get_profile_followers(*, session: Session, profile_id: uuid) -> FollowersPub
     )
 
 
-def get_profile_following(*, session: Session, profile_id: uuid) -> FollowingPublic:
+def get_profile_following(*, session: Session, profile_id: uuid) -> FollowingPublic | None:
     """
     Retrieve all profiles that a given profile is following.
 
@@ -79,10 +79,10 @@ def get_profile_following(*, session: Session, profile_id: uuid) -> FollowingPub
     Returns:
         FollowingPublic: A list of following profiles and the count.
     """
-    profile = session.exec(select(Profile).where(Profile.profile_id == profile_id)).first()
+    profile = session.get(Profile, profile_id)
 
     if not profile:
-        return FollowingPublic(following=[], count=0)
+        return None
 
     query = (
         select(Profile)

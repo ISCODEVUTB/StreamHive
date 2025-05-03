@@ -1,4 +1,4 @@
-import pytest
+import uuid
 from sqlmodel import Session
 
 from backend.logic.models import Follow
@@ -71,6 +71,19 @@ def test_get_profile_followers_empty(db: Session) -> None:
     assert followers.followers == []
 
 
+def test_get_profile_not_found_followers(db: Session) -> None:
+    profile1 = create_test_profile(db)
+    profile2 = create_test_profile(db)
+
+    db.add(Follow(follower_id=profile1.profile_id, following_id=profile2.profile_id))
+    db.commit()
+
+    nonexistent_profile_id = uuid.uuid4()
+    followers = follows.get_profile_followers(session=db, profile_id=nonexistent_profile_id)
+
+    assert followers is None
+
+
 def test_get_profile_following(db: Session) -> None:
     profile1 = create_test_profile(db)
     profile2 = create_test_profile(db)
@@ -91,4 +104,16 @@ def test_get_profile_following_empty(db: Session) -> None:
 
     assert following.count == 0
     assert following.following == []
-    
+
+
+def test_get_profile_not_found_following(db: Session) -> None:
+    profile1 = create_test_profile(db)
+    profile2 = create_test_profile(db)
+
+    db.add(Follow(follower_id=profile1.profile_id, following_id=profile2.profile_id))
+    db.commit()
+
+    nonexistent_profile_id = uuid.uuid4()
+    following = follows.get_profile_following(session=db, profile_id=nonexistent_profile_id)
+
+    assert following is None

@@ -56,12 +56,7 @@ def read_article_by_id(
 )
 def create_article(*, session: SessionDep, article_in: CreateArticle) -> Any:
     """
-    article = articles.get_article_by_title(session=session, article_title=article_in.article_title)
-    if article:
-        raise HTTPException(
-            status_code=400,
-            detail="An article with this title already exists in the system.",
-        )
+    Create a new article
     """
     article = articles.create_article(session=session, article_create=article_in)
     return article
@@ -106,4 +101,3 @@ def delete_article(
     
     session.delete(db_article)
     session.commit()
-    
