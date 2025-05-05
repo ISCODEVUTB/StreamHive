@@ -4,8 +4,7 @@ from datetime import date
 from pydantic import EmailStr
 from sqlmodel import Field, SQLModel
 
-from backend.logic.enum.user_status import UserStatus
-from backend.logic.enum.user_types import UserTypes
+from backend.logic.enum import UserStatus, UserGender, UserTypes
 
 class UserBase(SQLModel):
     """
@@ -19,6 +18,7 @@ class UserBase(SQLModel):
     full_name: Optional[str] = Field(default=None, max_length=255)
     email: EmailStr = Field(max_length=255)
     user_type: Optional[UserTypes] = None
+    user_gender: UserGender | None
 
 
 class CreateUser(UserBase):
@@ -32,7 +32,6 @@ class CreateUser(UserBase):
     """
     password: str = Field(min_length=8, max_length=16)
     birth_date: date
-    gender: str = Field(max_length=20)
 
 
 class RegisterUser(SQLModel):
@@ -49,7 +48,7 @@ class RegisterUser(SQLModel):
     full_name: str = Field(max_length=255)
     email: EmailStr = Field(max_length=255)
     birth_date: date
-    gender: str = Field(max_length=20)
+    user_gender: UserGender
     password: str = Field(min_length=8, max_length=16)
 
 
@@ -65,7 +64,7 @@ class UpdateUser(UserBase):
     """
     password: Optional[str] = Field(default=None, min_length=8, max_length=16)
     email: Optional[EmailStr] = Field(default=None, max_length=255)
-    gender: Optional[str] = Field(default=None, max_length=20)
+    user_gender: UserGender | None = None
     user_status: Optional[UserStatus] = None
 
 
@@ -80,8 +79,7 @@ class UpdateLogged(SQLModel):
     """
     full_name: str | None = Field(default=None, max_length=255)
     email: EmailStr | None = Field(default=None, max_length=255)
-    gender: str | None = Field(default=None, max_length=20)
-
+    user_gender: UserGender | None = None
 
 class UpdatePassword(SQLModel):
     """
@@ -107,7 +105,7 @@ class UserPublic(UserBase):
     """
     user_id: uuid.UUID
     birth_date: date
-    gender: str
+    user_gender: str
     user_status: UserStatus
 
 class UsersPublic(SQLModel):

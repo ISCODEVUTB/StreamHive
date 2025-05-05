@@ -24,7 +24,7 @@ router = APIRouter(prefix="/ratings", tags=["ratings"])
 )
 def read_ratings_by_username(
     *,
-    session: SessionDep, 
+    session: SessionDep,
     username: str
 ) -> ProfileRatingsPublic:
     """

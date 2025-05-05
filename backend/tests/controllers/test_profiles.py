@@ -16,7 +16,7 @@ def user_in() -> CreateUser:
         password =random_lower_string(),
         birth_date=random_birth_date(),
         full_name='User Example',
-        gender="Other",
+        user_gender="other",
         user_type="external"
     )
 

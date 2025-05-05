@@ -6,7 +6,6 @@ from sqlmodel import Session, select
 from backend.logic.models import Follow, Profile
 from backend.logic.schemas.profiles import ProfilePublic
 from backend.logic.schemas.follows import (
-    CreateFollow,
     FollowersPublic,
     FollowingPublic
 )
@@ -14,21 +13,23 @@ from backend.logic.schemas.follows import (
 
 def create_follow(
     *, session: Session, 
-    follow_create: CreateFollow
+    following_id: uuid.UUID,
+    follower_id: uuid.UUID
 ) -> Follow:
     """
-    Create a follow relationship between two profiles.
+    Creates a follow relationship between two profiles.
 
     Args:
         session (Session): Active SQLModel database session.
-        follow_create (CreateFollow): Data containing follower and following IDs.
+        following_id (UUID): ID of the profile being followed.
+        follower_id (UUID): ID of the profile that is following.
 
     Returns:
-        Follow: The created follow relationship.
+        Follow: The created follow relationship object.
     """
     db_obj = Follow(
-        follower_id=follow_create.follower_id,
-        following_id=follow_create.following_id
+        follower_id=follower_id,
+        following_id=following_id
     )
     session.add(db_obj)
     session.commit()

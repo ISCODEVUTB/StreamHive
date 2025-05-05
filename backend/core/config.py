@@ -50,5 +50,10 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str = "THE HIVE"
 
+    FIRST_SUPERUSER: EmailStr = "alex@gmail.com"
+    FIRST_SUPERUSER_PASSWORD: str = "password1234"
+
+    EMAIL_TEST_USER: EmailStr = "test@example.com"
+
 
 settings = Settings()  # type: ignore

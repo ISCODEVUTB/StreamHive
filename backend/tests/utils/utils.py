@@ -1,7 +1,10 @@
-import random
 import secrets
 import string
 from datetime import datetime, timedelta
+
+from fastapi.testclient import TestClient
+
+from backend.core.config import settings
 
 
 def random_lower_string() -> str:
@@ -12,7 +15,7 @@ def random_email() -> str:
     return f"{random_lower_string()}@{random_lower_string()}.com"
 
 
-def random_birth_date():
+def random_birth_date() -> datetime:
     today = datetime.now()
     earliest_birth = datetime(today.year - 50, 1, 1)
     latest_birth = datetime(today.year - 18, today.month, today.day)
@@ -22,7 +25,13 @@ def random_birth_date():
     return random_date.date()
 
 
-if __name__ == '__main__':
-    print(random_email())
-    print(random_lower_string())
-    print(random_birth_date())
+def get_superuser_token_headers(client: TestClient) -> dict[str, str]:
+    login_data = {
+        "username": settings.FIRST_SUPERUSER,
+        "password": settings.FIRST_SUPERUSER_PASSWORD,
+    }
+    r = client.post(f"{settings.API_V1_STR}/login/access-token", data=login_data)
+    tokens = r.json()
+    a_token = tokens["access_token"]
+    headers = {"Authorization": f"Bearer {a_token}"}
+    return headers

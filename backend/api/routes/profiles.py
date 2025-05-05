@@ -1,9 +1,10 @@
 import uuid
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import func, select
 
+from backend.api.schemas import Message
 from backend.logic.models import (
     Profile
 )
@@ -16,7 +17,7 @@ from backend.logic.schemas.profiles import (
     ProfilePublicEXT
 )
 from backend.logic.controllers import profiles
-from backend.api.deps import CurrentUser, SessionDep
+from backend.api.deps import CurrentUser, SessionDep, get_current_active_admin, get_current_user
 
 
 router = APIRouter(prefix="/profiles", tags=["profiles"])
@@ -38,6 +39,7 @@ def read_profiles(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
 
 @router.post(
     "/",
+    dependencies=[Depends(get_current_user)],
     response_model=ProfilePublic
 )
 def create_profile(*, session: SessionDep, profile_in: CreateProfile, current_user: CurrentUser) -> Any:
@@ -47,9 +49,36 @@ def create_profile(*, session: SessionDep, profile_in: CreateProfile, current_us
             status_code=400,
             detail="The profile with this username already exists in the system.",
         )
-    
-    profile = profiles.create_profile(session=session, profile_create=profile_in, user_id=current_user.user_id)
+    try:
+        profile = profiles.create_profile(session=session, profile_create=profile_in, user_id=current_user.user_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=409,
+            detail='User already with profile'
+        )
     return profile
+
+
+@router.delete(
+    "/", 
+    dependencies=[Depends(get_current_user)],
+    response_model=Message
+)
+def delete_profile(
+    session: SessionDep, 
+    current_user: CurrentUser
+) -> Message:
+    statement = select(Profile).where(Profile.user_id == current_user.user_id)
+    db_profile = session.exec(statement).first()
+    if not db_profile:
+        raise HTTPException(
+            status_code=404,
+            detail="The profile with this id does not exist in the system",
+        )
+    
+    session.delete(db_profile)
+    session.commit()
+    return Message(message='Profile deleted successfully')
 
 
 @router.get("/my-profile", response_model=ProfilePublic)
@@ -65,12 +94,13 @@ def read_profile_by_user(
 
 @router.patch(
     "/update",
-    response_model=ProfilePublic,
+    dependencies=[Depends(get_current_user)],
+    response_model=ProfilePublic
 )
-def update_profile(
+def update_logged_profile(
     *,
     session: SessionDep,
-    profile_in: UpdateProfile,
+    profile_in: UpdateLogged,
     current_user: CurrentUser
 ) -> Any:
     """
@@ -92,7 +122,7 @@ def update_profile(
 
     db_profile = profiles.update_profile(session=session, db_profile=db_profile, profile_in=profile_in)
     return db_profile
-
+    
 
 @router.get("/{profile_id}", response_model=ProfilePublic)
 def read_profile_by_id(
@@ -103,22 +133,32 @@ def read_profile_by_id(
     return profile
 
 
-@router.delete(
-    "/{profile_id}", 
-#    dependencies=[Depends(get_current_active_superuser)]
+@router.patch(
+    "/{profile_id}",
+    dependencies=[Depends(get_current_active_admin)],
+    response_model=ProfilePublic
 )
-def delete_profile(
-    session: SessionDep, 
-#    current_user: CurrentUser, 
+def update_profile(
+    *,
+    session: SessionDep,
+    profile_in: UpdateProfile,
     profile_id: uuid.UUID
-) -> None:
+) -> Any:
+    """
+    Update a user.
+    """
     db_profile = session.get(Profile, profile_id)
     if not db_profile:
         raise HTTPException(
             status_code=404,
             detail="The profile with this id does not exist in the system",
         )
-    
-    session.delete(db_profile)
-    session.commit()
-    
+    if profile_in.username:
+        existing_profile = profiles.get_profile_by_username(session=session, username=profile_in.username)
+        if existing_profile and existing_profile.profile_id != db_profile.profile_id:
+            raise HTTPException(
+                status_code=409, detail="Profile with this username already exists"
+            )
+
+    db_profile = profiles.update_profile(session=session, db_profile=db_profile, profile_in=profile_in)
+    return db_profile

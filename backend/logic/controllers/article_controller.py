@@ -29,7 +29,7 @@ class ArticleController:
                 f.seek(0)
                 f.truncate()
                 json.dump(data, f, indent=4)
-            return new_article.id
+            return new_article.article_id
         except Exception as e:
             print(f"Error al agregar articulo: {e}")
             return ""
@@ -50,7 +50,7 @@ class ArticleController:
             with open(self.file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 for article in data:
-                    if article['id'] == article_id:
+                    if article['article_id'] == article_id:
                         return article
         except Exception as e:
             print(f"Error al obtener articulo con su id '{article_id}': {e}")

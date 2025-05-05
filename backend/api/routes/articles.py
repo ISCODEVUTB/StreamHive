@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Annotated
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import func, select
 
 from backend.logic.models import (
@@ -16,7 +16,7 @@ from backend.logic.schemas.articles import (
     ArticlesPublic
 )
 from backend.logic.controllers import articles
-from backend.api.deps import SessionDep
+from backend.api.deps import SessionDep, get_current_active_internal_or_admin
 
 
 router = APIRouter(prefix="/articles", tags=["article"])
@@ -51,7 +51,8 @@ def read_article_by_id(
 
 
 @router.post(
-    "/", 
+    "/",
+    dependencies=[Depends(get_current_active_internal_or_admin)],
     response_model=CreateArticle
 )
 def create_article(*, session: SessionDep, article_in: CreateArticle) -> Any:

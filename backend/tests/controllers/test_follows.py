@@ -2,15 +2,14 @@ import uuid
 from sqlmodel import Session
 
 from backend.logic.models import Follow
-from backend.logic.enum import ProfileRoles, UserTypes
+from backend.logic.enum import ProfileRoles, UserTypes, UserGender
 from backend.logic.controllers import users, profiles, follows
-from backend.logic.schemas.follows import CreateFollow
 from backend.logic.schemas.users import CreateUser
 from backend.logic.schemas.profiles import CreateProfile
 from backend.tests.utils.utils import random_email, random_lower_string, random_birth_date
 
 full_name='User Example'
-gender="Other"
+gender=UserGender.OTHER
 user_type=UserTypes.EXTERNAL
 
 
@@ -20,7 +19,7 @@ def create_test_profile(db: Session):
         email=random_email(), 
         password=random_lower_string(),
         birth_date=random_birth_date(),
-        gender=gender,
+        user_gender=gender,
         user_type=user_type
     )
     
@@ -38,12 +37,8 @@ def create_test_profile(db: Session):
 def test_create_follow(db: Session) -> None:
     profile1 = create_test_profile(db)
     profile2 = create_test_profile(db)
-    
-    follow_in = CreateFollow(
-        follower_id=profile1.profile_id, following_id=profile2.profile_id
-    )
 
-    follow = follows.create_follow(session=db, follow_create=follow_in)
+    follow = follows.create_follow(session=db, following_id=profile2.profile_id, follower_id=profile1.profile_id)
 
     assert follow.follower_id==profile1.profile_id
     assert follow.following_id==profile2.profile_id

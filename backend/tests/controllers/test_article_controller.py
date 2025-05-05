@@ -2,6 +2,7 @@ import unittest
 import os
 import json
 from datetime import date
+import uuid
 from backend.logic.entities.article import Article
 from backend.logic.controllers.article_controller import ArticleController
 
@@ -23,11 +24,9 @@ class TestArticleController(unittest.TestCase):
             json.dump([], f)
 
         self.test_article = Article(
-            user_id=123,
-            section_id=10,
-            content="Test article content",
-            created_at=date(2025, 4, 18),
-            has_spoiler=False
+            article_id=uuid.uuid4(),
+            content='Test article content',
+            image_rel_url='test/image.png'
         )
 
     def tearDown(self):
@@ -42,7 +41,7 @@ class TestArticleController(unittest.TestCase):
         Test adding an article to the storage.
         """
         result_id = self.controller.add(self.test_article)
-        self.assertEqual(result_id, self.test_article.id)
+        self.assertEqual(result_id, self.test_article.article_id)
 
         with open(self.test_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -65,7 +64,7 @@ class TestArticleController(unittest.TestCase):
         articles = self.controller.get_all()
         self.assertIsInstance(articles, list)
         self.assertEqual(len(articles), 1)
-        self.assertIsNotNone(articles[0]['id'])
+        self.assertIsNotNone(articles[0]['article_id'])
 
     def test_get_all_with_corrupt_file(self):
         """
@@ -82,9 +81,9 @@ class TestArticleController(unittest.TestCase):
         Test retrieving an article by ID that exists.
         """
         self.controller.add(self.test_article)
-        found = self.controller.get_by_id(str(self.test_article.id))
+        found = self.controller.get_by_id(str(self.test_article.article_id))
         self.assertIsNotNone(found)
-        self.assertEqual(found['id'], str(self.test_article.id))
+        self.assertEqual(found['article_id'], str(self.test_article.article_id))
 
     def test_get_article_by_id_not_found(self):
         """
@@ -104,25 +103,14 @@ class TestArticleController(unittest.TestCase):
         result = self.controller.get_by_id(1)
         self.assertIsNone(result)
 
-    def test_created_at_serialization(self):
-        """
-        Test that created_at is serialized as a string in the stored JSON.
-        """
-        self.controller.add(self.test_article)
-        with open(self.test_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            self.assertIsInstance(data[0]['created_at'], str)
-
     def test_add_multiple_articles(self):
         """
         Test adding multiple articles.
         """
         article2 = Article(
-            user_id=456,
-            section_id=11,
-            content="Second article",
-            created_at=date(2025, 4, 19),
-            has_spoiler=True
+            article_id=uuid.uuid4(),
+            content='Second article',
+            image_rel_url='test/image2.png'
         )
 
         self.controller.add(self.test_article)
@@ -130,7 +118,7 @@ class TestArticleController(unittest.TestCase):
 
         articles = self.controller.get_all()
         self.assertEqual(len(articles), 2)
-        self.assertIsNotNone(articles[1]['id'])
+        self.assertIsNotNone(articles[1]['article_id'])
         self.assertEqual(articles[1]['content'], "Second article")
 
 

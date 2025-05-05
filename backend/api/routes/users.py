@@ -4,6 +4,8 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import func, select
 
+from backend.api.schemas import Message
+from backend.core.security import verify_password
 from backend.logic.models import (
     User
 )
@@ -17,7 +19,7 @@ from backend.logic.schemas.users import (
     UsersPublic
 )
 from backend.logic.controllers import users
-from backend.api.deps import CurrentUser, SessionDep, get_current_active_admin
+from backend.api.deps import CurrentUser, SessionDep, get_current_active_admin, get_current_user
 
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -64,7 +66,7 @@ def create_user(*, session: SessionDep, user_in: CreateUser) -> Any:
 
 
 @router.post(
-    "/register",
+    "/signup",
     response_model=UserPublic
 )
 def register_user(*, session: SessionDep, user_in: RegisterUser) -> Any:
@@ -93,12 +95,12 @@ def read_user_logged_account(
     """
     Get a specific user by id.
     """
-    user = session.get(User, uuid.UUID(current_user.user_id))
+    user = session.get(User, current_user.user_id)
     return user
 
 
 @router.patch(
-    "/account/update",
+    "/account",
     response_model=UserPublic,
 )
 def update_logged_user(
@@ -110,7 +112,7 @@ def update_logged_user(
     """
     Update a user.
     """
-    db_user = session.get(User, uuid.UUID(current_user.user_id))
+    db_user = session.get(User, current_user.user_id)
     if not db_user:
         raise HTTPException(
             status_code=404,
@@ -126,6 +128,34 @@ def update_logged_user(
     db_user = users.update_user(session=session, db_user=db_user, user_in=user_in)
     return db_user
 
+
+@router.patch(
+    "/account/password",
+    dependencies=[Depends(get_current_user)],
+    response_model=Message   
+)
+def update_password(
+    session: SessionDep,
+    user_in: UpdatePassword,
+    current_user: CurrentUser
+) -> Any:
+    """
+    Update a user's password.
+    """
+    db_user = session.get(User, current_user.user_id)
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail=msg,
+        )
+    if not verify_password(user_in.current_password, db_user.hashed_password):
+        raise HTTPException(
+            status_code=400,
+            detail="Incorrect password"
+        )
+
+    db_user = users.update_user(session=session, db_user=db_user, user_in=user_in)
+    return Message(message='Password updated successfully')
 
 @router.get(
     "/{user_id}", 
@@ -175,14 +205,14 @@ def update_user(
 
 
 @router.post(
-    "/{user_id}"
+    "/account/delete",
+    dependencies=[Depends(get_current_user)]
 )
 def delete_user(
     session: SessionDep, 
-#    current_user: CurrentUser, 
-    user_id: uuid.UUID
+    current_user: CurrentUser
 ) -> User:
-    db_user = session.get(User, user_id)
+    db_user = session.get(User, current_user.user_id)
     if not db_user:
         raise HTTPException(
             status_code=404,
@@ -190,7 +220,7 @@ def delete_user(
         )
     
     user_in = UpdateUser(
-        email=f"deleted-user-{user_id}@example.com",
+        email=f"deleted-user-{current_user.user_id}@example.com",
         user_status='deleted'
     )
 
@@ -200,12 +230,13 @@ def delete_user(
 
 @router.delete(
     "/{user_id}", 
-    dependencies=[Depends(get_current_active_admin)]
+    dependencies=[Depends(get_current_active_admin)],
+    response_model=Message
 )
-def delete_user_definitely(
+def delete_user(
     session: SessionDep,
     user_id: uuid.UUID
-) -> None:
+) -> Message:
     db_user = session.get(User, user_id)
     if not db_user:
         raise HTTPException(
@@ -215,3 +246,4 @@ def delete_user_definitely(
     
     session.delete(db_user)
     session.commit()
+    return Message(message='User deleted successfully')

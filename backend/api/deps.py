@@ -25,10 +25,10 @@ reusable_oauth2 = OAuth2PasswordBearer(
 
 def get_db() -> Generator[Session, None, None]:
     """
-    Proporciona una sesión de base de datos activa para operaciones SQLAlchemy.
+    Provides an active database session for SQLAlchemy operations.
 
     Returns:
-        Session: Una sesión activa para interactuar con la base de datos.
+        Session: An active session to interact with the database.
     """
     with Session(engine) as session:
         yield session
@@ -41,7 +41,7 @@ TokenDep = Annotated[str, Depends(reusable_oauth2)]
 def get_current_user(session: SessionDep, token: TokenDep) -> User:
     try:
         payload = jwt.decode(
-            token, security.SECRET_KEY, algorithms=[security.ALGORITHM]
+            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
         token_data = TokenPayload(**payload)
     except (PyJWTError, ValidationError):
@@ -62,7 +62,6 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 def get_current_active_admin(current_user: CurrentUser) -> User:
-    print(f'current: {current_user}')
     if not current_user.user_type == UserTypes.ADMIN:
         raise HTTPException(
             status_code=403, detail="The user doesn't have enough privileges"
@@ -71,8 +70,17 @@ def get_current_active_admin(current_user: CurrentUser) -> User:
 
 
 def get_current_active_internal(current_user: CurrentUser) -> User:
-    print(f'current: {current_user}')
     if not current_user.user_type == UserTypes.INTERNAL:
+        raise HTTPException(
+            status_code=403, detail="The user doesn't have enough privileges"
+        )
+    return current_user
+
+def get_current_active_internal_or_admin(current_user: CurrentUser):
+    internal: bool = current_user.user_type == UserTypes.ADMIN
+    admin: bool = current_user.user_type == UserTypes.INTERNAL
+
+    if not (internal or admin):
         raise HTTPException(
             status_code=403, detail="The user doesn't have enough privileges"
         )

@@ -3,7 +3,7 @@ from typing import Optional
 from datetime import date, datetime, timezone
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
-from backend.logic.enum import UserStatus, UserTypes
+from backend.logic.enum import UserStatus, UserTypes, UserGender
 
 
 class User(SQLModel, table=True):
@@ -15,7 +15,7 @@ class User(SQLModel, table=True):
         email (EmailStr): Unique email address of the user, indexed for fast lookup.
         hashed_password (str): Hashed password for authentication purposes.
         birth_date (date): User's date of birth.
-        gender (str): User's gender (max 20 characters typically).
+        user_gender (str): User's gender (max 20 characters typically).
         user_status (UserStatus): Current status of the user (active, inactive, deleted).
         user_type (UserTypes): Type of user (internal or external).
         user_id (UUID): Primary key identifier, auto-generated UUID.
@@ -26,7 +26,7 @@ class User(SQLModel, table=True):
     email: EmailStr = Field(unique=True, index=True, max_length=255)
     hashed_password: str
     birth_date: date
-    gender: str
+    user_gender: UserGender
 
     user_status: UserStatus = Field(default=UserStatus.ACTIVE)
     user_type: UserTypes = Field(default=UserTypes.EXTERNAL)

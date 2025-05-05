@@ -8,11 +8,13 @@ from backend.logic.schemas.articles import ArticlePublic
 class CreateAuthor(SQLModel):
     profile_id: uuid.UUID
     article_id: uuid.UUID
+    main_author: bool = False
 
 
 class UpdateAuthor(SQLModel):
-    profile_id: uuid.UUID | None
-    article_id: uuid.UUID | None
+    profile_id: uuid.UUID | None = None
+    article_id: uuid.UUID | None = None
+    main_author: bool | None = None
 
 
 class AuthorsPublic(SQLModel):

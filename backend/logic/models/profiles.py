@@ -28,7 +28,7 @@ class Profile(SQLModel, table=True):
     description: str | None = Field(default=None, max_length=255)
     profile_role: ProfileRoles = Field(default=ProfileRoles.SUBSCRIBER)
     image_rel_path: str | None = Field(default=None)
-    user_id: uuid.UUID = Field(foreign_key="user.user_id")
+    user_id: uuid.UUID = Field(foreign_key="user.user_id", unique=True, nullable=False)
 
     profile_id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     

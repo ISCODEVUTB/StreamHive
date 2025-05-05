@@ -1,3 +1,4 @@
+import uuid
 from sqlmodel import SQLModel
 
 
@@ -7,11 +8,13 @@ class ProfileRating(SQLModel):
 
 
 class ProfileRatingsPublic(SQLModel):
+    profile_id: uuid.UUID
     username: str
     ratings: list[ProfileRating]
 
 
 class MovieRating(SQLModel):
+    profile_id: uuid.UUID
     username: str
     rate: float
 

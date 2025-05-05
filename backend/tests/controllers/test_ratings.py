@@ -1,9 +1,10 @@
+import uuid
 import pytest
 from sqlmodel import Session
 from sqlmodel import func, select
 
 from backend.logic.models import Rating
-from backend.logic.enum import ProfileRoles, UserTypes
+from backend.logic.enum import ProfileRoles, UserTypes, UserGender
 from backend.logic.controllers import users, profiles, ratings
 from backend.logic.schemas.ratings import ProfileRatingsPublic, MovieRatingsPublic
 from backend.logic.schemas.users import CreateUser
@@ -11,7 +12,7 @@ from backend.logic.schemas.profiles import CreateProfile
 from backend.tests.utils.utils import random_email, random_lower_string, random_birth_date
 
 full_name='User Example'
-gender="Other"
+gender=UserGender.OTHER
 user_type=UserTypes.EXTERNAL
 
 
@@ -21,7 +22,7 @@ def user_and_profile_in(db: Session):
         email=random_email(), 
         password =random_lower_string(),
         birth_date=random_birth_date(),
-        gender=gender,
+        user_gender=gender,
         user_type=user_type
     )
     
@@ -50,7 +51,7 @@ def test_create_or_update_rating(db: Session) -> None:
     assert rating.rate == rate
 
 
-def test_get_rating_by_username(db: Session) -> None:
+def test_get_rating_by_profile(db: Session) -> None:
     _, profile = user_and_profile_in(db)
     movie_id = "movie-com-456"
     rate = 3.5
@@ -58,7 +59,7 @@ def test_get_rating_by_username(db: Session) -> None:
     ratings.create_or_update_rating(
          session=db, profile_id=profile.profile_id, movie_id=movie_id, rate=rate
     )
-    rating = ratings.get_ratings_by_username(session=db, username=profile.username)
+    rating = ratings.get_ratings_by_profile(session=db, profile_id=profile.profile_id)
 
     assert isinstance(rating, ProfileRatingsPublic)
     assert rating.username == profile.username
@@ -66,14 +67,12 @@ def test_get_rating_by_username(db: Session) -> None:
     assert rating.ratings[0].movie_id == movie_id
 
 
-def test_get_rating_by_nonexistent_username(db: Session) -> None:
-    non_existent = "dontExist"
+def test_get_rating_by_nonexistent_profile(db: Session) -> None:
+    non_existent = uuid.uuid4()
 
-    rating = ratings.get_ratings_by_username(session=db, username=non_existent)
+    rating = ratings.get_ratings_by_profile(session=db, profile_id=non_existent)
 
-    assert isinstance(rating, ProfileRatingsPublic)
-    assert rating.username == non_existent
-    assert len(rating.ratings) == 0
+    assert rating is None
 
 
 def test_get_rating_by_movie_id(db: Session) -> None:

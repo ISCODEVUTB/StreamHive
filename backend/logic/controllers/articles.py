@@ -1,9 +1,7 @@
 import uuid
-from typing import Any, Optional
-from datetime import datetime, date
+from typing import Any
 from sqlmodel import Session, select
 
-from backend.core.security import get_password_hash, verify_password
 from backend.logic.models import Article
 from backend.logic.schemas.articles import CreateArticle, UpdateArticle
 

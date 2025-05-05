@@ -44,28 +44,28 @@ def create_or_update_rating(
     return db_obj
 
 
-def get_ratings_by_username(
-    *, session: Session, username: str
-) -> ProfileRatingsPublic:
+def get_ratings_by_profile(
+    *, session: Session, profile_id: uuid.UUID
+) -> ProfileRatingsPublic | None:
     """
     Retrieve all movie ratings made by a profile, identified by its username.
 
     Args:
         session (Session): Active SQLModel database session.
-        username (str): The username of the profile to fetch ratings for.
+        profile_id (uuid.UUID): The ID of the profile to fetch ratings for.
 
     Returns:
-        ProfileRatingsPublic: A collection of ratings associated with the given profile username.
+        ProfileRatingsPublic: A collection of ratings associated with the given profile ID.
     """
-    profile = session.exec(select(Profile).where(Profile.username == username)).first()
-
+    profile = session.get(Profile, profile_id)
     if not profile:
-        return ProfileRatingsPublic(username=username, ratings=[])
+        return None
     
+    username = profile.username
     session_ratings = session.exec(select(Rating).where(Rating.profile_id == profile.profile_id)).all()
     ratings_list = [ProfileRating(movie_id=r.movie_id, rate=r.rate) for r in session_ratings]
 
-    return ProfileRatingsPublic(username=username, ratings=ratings_list)
+    return ProfileRatingsPublic(profile_id=profile_id, username=username, ratings=ratings_list)
 
 
 def get_ratings_by_movie_id(
@@ -82,15 +82,15 @@ def get_ratings_by_movie_id(
         MovieRatingsPublic: A collection of profiles with ratings for the specified movie.
     """
     rating = (
-        select(Rating, Profile.username)
+        select(Rating, Profile.profile_id, Profile.username)
         .join(Profile, Profile.profile_id == Rating.profile_id)
         .where(Rating.movie_id == movie_id)
     )
 
     ratings = list(session.exec(rating))
     ratings_list = [
-        MovieRating(username=username, rate=rating.rate)
-        for rating, username in ratings
+        MovieRating(profile_id=profile_id, username=username, rate=rating.rate)
+        for rating, profile_id, username in ratings
     ]
 
     return MovieRatingsPublic(movie_id=movie_id, ratings=ratings_list)
