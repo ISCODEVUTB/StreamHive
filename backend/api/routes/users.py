@@ -157,6 +157,31 @@ def update_password(
     db_user = users.update_user(session=session, db_user=db_user, user_in=user_in)
     return Message(message='Password updated successfully')
 
+
+@router.post(
+    "/account/delete",
+    dependencies=[Depends(get_current_user)]
+)
+def delete_user(
+    session: SessionDep, 
+    current_user: CurrentUser
+) -> User:
+    db_user = session.get(User, current_user.user_id)
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail=msg,
+        )
+    
+    user_in = UpdateUser(
+        email=f"deleted-user-{current_user.user_id}@example.com",
+        user_status='deleted'
+    )
+
+    db_user = users.update_user(session=session, db_user=db_user, user_in=user_in)
+    return db_user
+
+
 @router.get(
     "/{user_id}", 
     dependencies=[Depends(get_current_active_admin)],
@@ -199,30 +224,6 @@ def update_user(
             raise HTTPException(
                 status_code=409, detail="User with this email already exists"
             )
-
-    db_user = users.update_user(session=session, db_user=db_user, user_in=user_in)
-    return db_user
-
-
-@router.post(
-    "/account/delete",
-    dependencies=[Depends(get_current_user)]
-)
-def delete_user(
-    session: SessionDep, 
-    current_user: CurrentUser
-) -> User:
-    db_user = session.get(User, current_user.user_id)
-    if not db_user:
-        raise HTTPException(
-            status_code=404,
-            detail=msg,
-        )
-    
-    user_in = UpdateUser(
-        email=f"deleted-user-{current_user.user_id}@example.com",
-        user_status='deleted'
-    )
 
     db_user = users.update_user(session=session, db_user=db_user, user_in=user_in)
     return db_user

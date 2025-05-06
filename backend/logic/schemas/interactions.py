@@ -7,7 +7,7 @@ from backend.logic.enum import InteractTypes, TargetTypes
 class CreateInteraction(SQLModel):
     target_id: uuid.UUID
     target_type: TargetTypes
-    Interaction_type: InteractTypes
+    interaction_type: InteractTypes
     profile_id: uuid.UUID
 
 
