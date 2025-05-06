@@ -5,6 +5,7 @@ from sqlmodel import Session, select
 
 from backend.logic.models import Rating, Profile
 from backend.logic.schemas.ratings import (
+    CreateRating,
     ProfileRating, 
     ProfileRatingsPublic, 
     MovieRating, 
@@ -13,31 +14,30 @@ from backend.logic.schemas.ratings import (
 
 
 def create_or_update_rating(
-    *, session: Session, profile_id: uuid.UUID, movie_id: str, rate: float
+    *, session: Session, profile_id: uuid.UUID, movie_id: str, rating_in: CreateRating,
 ) -> Rating:
     """
-    Create or update a rating by profile_id for a movie
+    Create or update a rating using a validated CreateRating schema.
 
     Args:
         session (Session): Active SQLModel database session.
-        profile_id (uuid.UUID): The profile ID that is rating the movie.
-        movie_id (str): The ID of the movie being rated.
-        rate (float): The rating value, typically between 0 and 5.
+        rating_in (CreateRating): Input schema containing profile_id, movie_id, and rate.
 
     Returns:
         Rating: The created or updated rating object.
     """
     db_obj = session.exec(
         select(Rating).where(
-            Rating.profile_id == profile_id, Rating.movie_id == movie_id
+            Rating.profile_id == profile_id,
+            Rating.movie_id == movie_id
         )
     ).first()
 
     if db_obj:
-        db_obj.rate = rate
+        db_obj.rate = rating_in.rate
     else:
-        db_obj = Rating(profile_id=profile_id, movie_id=movie_id, rate=rate)
-    
+        db_obj = Rating.model_validate(rating_in)
+
     session.add(db_obj)
     session.commit()
     session.refresh(db_obj)

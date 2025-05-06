@@ -1,36 +1,75 @@
 import uuid
 from typing import Any, Annotated
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import func, select
 
 from backend.logic.models import Rating, Profile
 from backend.logic.schemas.ratings import (
+    CreateRating,
     ProfileRating, 
     ProfileRatingsPublic, 
     MovieRating, 
     MovieRatingsPublic
 )
 from backend.logic.controllers import ratings
-from backend.api.deps import SessionDep
+from backend.api.deps import CurrentUser, SessionDep, get_current_user
+from backend.api.schemas import Message
 
 
 router = APIRouter(prefix="/ratings", tags=["ratings"])
 
 
+@router.post(
+    "/",
+    dependencies=Depends(get_current_user),
+    response_model=Rating
+)
+def create_or_update_rating(
+    *, 
+    session: SessionDep,
+    current_user: CurrentUser,
+    movie_id: uuid.UUID,
+    rate_in: CreateRating
+) -> Rating:
+    """
+    Create or update a rating for a movie by a profile.
+    """
+    statement = select(Profile).where(Profile.user_id == current_user.user_id)
+    profile_in: Profile = session.exec(statement).first()
+    profile_id = profile_in.profile_id
+
+    rating = CreateRating(
+        rate=rate_in.rate,
+    )
+
+    rating = ratings.create_or_update_rating(
+        session=session, 
+        profile_id=profile_id,
+        movie_id=movie_id,
+        rating_in=rating
+    )
+    return rating
+
+
 @router.get(
-    "/profile/{username}",
+    "/profile",
+    dependencies=Depends(get_current_user),
     response_model=ProfileRatingsPublic,
 )
-def read_ratings_by_username(
+def read_ratings_by_profile(
     *,
     session: SessionDep,
-    username: str
+    current_user: CurrentUser   
 ) -> ProfileRatingsPublic:
     """
     Retrieve all ratings made by a user (by username).
     """
-    return ratings.get_ratings_by_username(session=session, username=username)
+    statement = select(Profile).where(Profile.user_id == current_user.user_id)
+    profile_in: Profile = session.exec(statement).first()
+    profile_id = profile_in.profile_id
+
+    return ratings.get_ratings_by_profile(session=session, profile_id=profile_id)
 
 
 @router.get(
@@ -64,36 +103,11 @@ def get_average_rating_for_movie(
     average = avg if avg is not None else 0.0
     return round(average, 2)
 
-@router.post(
-    "/", 
-    response_model=Rating
+
+@router.delete(
+    "/movie/{movie_id}/profile/{profile_id}",
+    response_model=Message
 )
-def create_or_update_rating(
-    *, 
-    session: SessionDep,
-    profile_id: uuid.UUID,
-    movie_id: str,
-    rate: float
-) -> Rating:
-    """
-    Create or update a rating for a movie by a profile.
-    """
-    if not (0 <= rate <= 5):
-        raise HTTPException(
-            status_code=400,
-            detail="Rating value must be between 0 and 5.",
-        )
-    
-    rating = ratings.create_or_update_rating(
-        session=session, 
-        profile_id=profile_id,
-        movie_id=movie_id,
-        rate=rate
-    )
-    return rating
-
-
-@router.delete("/profile/{profile_id}/movie/{movie_id}")
 def delete_rating(
     *,
     session: SessionDep,
@@ -115,4 +129,4 @@ def delete_rating(
 
     session.delete(rating)
     session.commit()
-    return {"message": "Rating deleted successfully."}
+    return Message(message="Rating deleted successfully.")

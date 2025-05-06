@@ -68,13 +68,6 @@ def get_current_active_admin(current_user: CurrentUser) -> User:
     return current_user
 
 
-def get_current_active_internal(current_user: CurrentUser) -> User:
-    if not current_user.user_type == UserTypes.INTERNAL:
-        raise HTTPException(
-            status_code=403, detail="The user doesn't have enough privileges"
-        )
-    return current_user
-
 def get_current_active_internal_or_admin(current_user: CurrentUser):
     internal: bool = current_user.user_type == UserTypes.ADMIN
     admin: bool = current_user.user_type == UserTypes.INTERNAL

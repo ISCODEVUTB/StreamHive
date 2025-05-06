@@ -25,6 +25,7 @@ router = APIRouter(prefix="/profiles", tags=["profiles"])
 
 @router.get(
     "/",
+    dependencies=[Depends(get_current_user)],
     response_model=ProfilesPublic,
 )
 def read_profiles(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
