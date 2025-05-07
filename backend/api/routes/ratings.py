@@ -22,14 +22,14 @@ router = APIRouter(prefix="/ratings", tags=["ratings"])
 
 @router.post(
     "/",
-    dependencies=Depends(get_current_user),
+    dependencies=[Depends(get_current_user)],
     response_model=Rating
 )
 def create_or_update_rating(
     *, 
     session: SessionDep,
     current_user: CurrentUser,
-    movie_id: uuid.UUID,
+    movie_id: str,
     rate_in: CreateRating
 ) -> Rating:
     """
@@ -54,16 +54,16 @@ def create_or_update_rating(
 
 @router.get(
     "/profile",
-    dependencies=Depends(get_current_user),
+    dependencies=[Depends(get_current_user)],
     response_model=ProfileRatingsPublic,
 )
-def read_ratings_by_profile(
+def read_my_ratings(
     *,
     session: SessionDep,
     current_user: CurrentUser   
 ) -> ProfileRatingsPublic:
     """
-    Retrieve all ratings made by a user (by username).
+    Retrieve all ratings made by a user (by profile).
     """
     statement = select(Profile).where(Profile.user_id == current_user.user_id)
     profile_in: Profile = session.exec(statement).first()
@@ -73,8 +73,28 @@ def read_ratings_by_profile(
 
 
 @router.get(
+    "/profile/{profile_id}",
+    dependencies=[Depends(get_current_user)],
+    response_model=ProfileRatingsPublic,
+)
+def read_ratings_by_profile(
+    *,
+    session: SessionDep,
+    profile_id: uuid.UUID   
+) -> ProfileRatingsPublic:
+    """
+    Retrieve all ratings made by a user (by profile).
+    """
+    profile_id: Profile = session.get(Profile, profile_id)
+    profile_id = profile_id.profile_id
+
+    return ratings.get_ratings_by_profile(session=session, profile_id=profile_id)
+
+
+@router.get(
     "/movie/{movie_id}",
-    response_model=MovieRatingsPublic,
+    dependencies=[Depends(get_current_user)],
+    response_model=MovieRatingsPublic
 )
 def read_ratings_by_movie_id(
     *,

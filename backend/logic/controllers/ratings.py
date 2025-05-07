@@ -36,7 +36,11 @@ def create_or_update_rating(
     if db_obj:
         db_obj.rate = rating_in.rate
     else:
-        db_obj = Rating.model_validate(rating_in)
+        db_obj = Rating(
+            profile_id=profile_id,
+            movie_id=movie_id,
+            rate=rating_in.rate
+        )
 
     session.add(db_obj)
     session.commit()

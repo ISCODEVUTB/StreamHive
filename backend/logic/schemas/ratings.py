@@ -8,7 +8,7 @@ class ProfileRating(SQLModel):
 
 
 class CreateRating(SQLModel):
-    rate: float = Field(ge=1.5, le=5, decimal_places=1)
+    rate: float = Field(ge=1.5, le=5)
 
 
 class ProfileRatingsPublic(SQLModel):
