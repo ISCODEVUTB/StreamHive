@@ -1,9 +1,10 @@
 from fastapi.testclient import TestClient
+from pytest import Session
 
 from backend.core.config import settings
 
 
-def test_get_access_token(client: TestClient) -> None:
+def test_get_access_token(client: TestClient, db: Session) -> None:
     login_data = {
         "username": settings.FIRST_SUPERUSER,
         "password": settings.FIRST_SUPERUSER_PASSWORD,
@@ -15,7 +16,7 @@ def test_get_access_token(client: TestClient) -> None:
     assert tokens["access_token"]
 
 
-def test_get_access_token_incorrect_password(client: TestClient) -> None:
+def test_get_access_token_incorrect_password(client: TestClient, db: Session) -> None:
     login_data = {
         "username": settings.FIRST_SUPERUSER,
         "password": "incorrect",
@@ -25,7 +26,7 @@ def test_get_access_token_incorrect_password(client: TestClient) -> None:
 
 
 def test_use_access_token(
-    client: TestClient, superuser_token_headers: dict[str, str]
+    client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:
     r = client.post(
         f"{settings.API_V1_STR}/login/test-token",

@@ -5,17 +5,19 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import func, select
 
 from backend.logic.models import (
-    Article
+    Article,
 )
 from backend.logic.schemas.articles import (
     CreateArticle,
+    BodyArticle,
     UpdateArticle,
     SectionArticles,
     NewsletterArticles,
     ArticlePublic,
     ArticlesPublic
 )
-from backend.logic.controllers import articles
+from backend.logic.entities import article as EntityArticle
+from backend.logic.controllers import articles, article_controller
 from backend.api.deps import SessionDep, get_current_active_internal_or_admin
 
 
@@ -53,13 +55,30 @@ def read_article_by_id(
 @router.post(
     "/",
     dependencies=[Depends(get_current_active_internal_or_admin)],
-    response_model=CreateArticle
+    response_model=ArticlePublic
 )
-def create_article(*, session: SessionDep, article_in: CreateArticle) -> Any:
+def create_article(
+    *, 
+    session: SessionDep, 
+    article_in: CreateArticle, 
+    body_article:BodyArticle
+) -> Any:
     """
     Create a new article
     """
     article = articles.create_article(session=session, article_create=article_in)
+    try:
+        article_controller.ArticleController().add(EntityArticle(
+            article_id=str(article.article_id),
+            content=BodyArticle.content,
+            image_rel_url=BodyArticle.image_rel_url
+        ))
+    except Exception:
+        session.delete(session.get(Article, article.article_id))
+        raise HTTPException(
+            status_code=400,
+            detail="Could not create movie list"
+        )
     return article
 
 
@@ -72,12 +91,27 @@ def update_article(
     session: SessionDep,
     article_id: uuid.UUID,
     article_in: UpdateArticle,
+    body_article: BodyArticle,
 ) -> Any:
     db_article = session.get(Article, article_id)
     if not db_article:
         raise HTTPException(
             status_code=404,
             detail=msg,
+        )
+    
+    try:
+        updates = {}
+        if body_article.content:
+            updates['content'] = body_article.content
+        if body_article.image_rel_url:
+            updates['image_rel_url'] = body_article.image_rel_url
+
+        article_controller.ArticleController().update_article(str(article_id), updates)
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail='Could not update the file'
         )
 
     db_article = articles.update_article(session=session, db_article=db_article, article_in=article_in)

@@ -261,12 +261,12 @@ def delete_movie_list(session: SessionDep, list_id: uuid.UUID, current_user: Cur
             detail='Not authorize to delete list'
         )
     
-    """rmv = movie_list_controller.MovieListController().remove(str(list_id))
+    rmv = movie_list_controller.MovieListController().remove(str(list_id))
     if not rmv:
         raise HTTPException(
             status_code=500,
             detail="Could not delete movie list"
-        )"""
+        )
 
     session.delete(db_list)
     session.commit()

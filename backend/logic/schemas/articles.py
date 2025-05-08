@@ -27,6 +27,19 @@ class CreateArticle(ArticleBase):
     newsletter_id: int | None = None
 
 
+class BodyArticle(SQLModel):
+    """
+    Model representing the Article entity.
+
+    Attributes:
+        article_id: ID of the article.
+        content: The textual content of the article.
+        image_rel_url: Location of the image used for the article 
+    """
+    content: str
+    image_rel_url: str
+
+
 class UpdateArticle(SQLModel):
     """
     Model for updating an existing article.

@@ -34,7 +34,8 @@ class Profile(SQLModel, table=True):
     
     user: "User" = Relationship(back_populates="profile")
     movie_list: list["MovieList"] = Relationship(back_populates="profile")
-    interaction: list["Interaction"] = Relationship(back_populates="profile")
+    reaction: list["Reaction"] = Relationship(back_populates="profile")
+    comment: list["Comment"] = Relationship(back_populates="profile")
     rating: list["Rating"] = Relationship(back_populates="profile")
     following: list["Follow"] = Relationship(
         back_populates="follower",

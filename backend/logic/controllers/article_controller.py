@@ -35,7 +35,6 @@ class ArticleController:
             return ""
 
     def get_all(self):
-
         try:
             with open(self.file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
@@ -55,3 +54,40 @@ class ArticleController:
         except Exception as e:
             print(f"Error al obtener articulo con su id '{article_id}': {e}")
         return None
+    
+    def update_article(self, article_id: str, updates: dict) -> bool:
+        try:
+            with open(self.file, 'r+', encoding='utf-8') as f:
+                data = json.load(f)
+
+                for i, article in enumerate(data):
+                    if article['article_id'] == article_id:
+                        data[i].update(updates)
+                        f.seek(0)
+                        f.truncate()
+                        json.dump(data, f, indent=4)
+                        return True
+
+            return False  # No se encontró el artículo
+        except Exception as e:
+            print(f"Error al actualizar artículo con ID '{article_id}': {e}")
+            return False
+        
+    def delete_article(self, article_id: str) -> bool:
+        try:
+            with open(self.file, 'r+', encoding='utf-8') as f:
+                data = json.load(f)
+                original_length = len(data)
+                
+                data = [article for article in data if article['article_id'] != article_id]
+                
+                if len(data) == original_length:
+                    return False  # No se encontró el artículo
+
+                f.seek(0)
+                f.truncate()
+                json.dump(data, f, indent=4)
+                return True
+        except Exception as e:
+            print(f"Error al eliminar artículo con ID '{article_id}': {e}")
+            return False

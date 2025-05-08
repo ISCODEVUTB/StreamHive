@@ -10,7 +10,7 @@ from backend.logic.schemas.movie_lists import CreateMovieList, UpdateMovieList
 from backend.tests.utils.utils import random_email, random_lower_string, random_birth_date
 
 
-def user_and_profile_in(session: Session):  
+def user_and_profile_in(db: Session):  
     user_create = CreateUser(
         email=random_email(), 
         password =random_lower_string(),
@@ -20,13 +20,13 @@ def user_and_profile_in(session: Session):
         user_type="external"
     )
 
-    user = users.create_user(session=session, user_create=user_create)
+    user = users.create_user(session=db, user_create=user_create)
 
     profile_create = CreateProfile(
         username=random_lower_string()
     )
 
-    profile = profiles.create_profile(session=session, profile_create=profile_create, user_id=user.user_id)
+    profile = profiles.create_profile(session=db, profile_create=profile_create, user_id=user.user_id)
 
     return user, profile
 
