@@ -94,6 +94,7 @@ def create_list(session: SessionDep, list_in: CreateMovieList, current_user: Cur
         ))
     except Exception:
         session.delete(session.get(MovieList, movielist.list_id))
+        session.commit()
         raise HTTPException(
             status_code=500,
             detail="Could not create movie list"
@@ -116,7 +117,7 @@ def read_movie_list_by_id(
     profile_id = profile_in.profile_id
 
     movielist: MovieList = session.get(MovieList, list_id)
-    if not movielist.privacy and movielist.profile_id == profile_id:
+    if not movielist.privacy or movielist.profile_id == profile_id:
         json_file = movie_list_controller.MovieListController().get_by_id(str(list_id))
         
         movielist = {attr: getattr(movielist, attr) for attr in dir(movielist) if not attr.startswith('_')}

@@ -432,7 +432,7 @@ def test_delete_user(client: TestClient, db: Session) -> None:
     assert deleted_user["user_status"] == "deleted"
     result = db.exec(select(User).where(User.user_id == user_id)).first()
     db.refresh(result)
-    assert not result.email == username
+    assert result.email != username
 
 
 def test_delete_user_super_user(

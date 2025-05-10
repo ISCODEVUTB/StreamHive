@@ -56,7 +56,10 @@ def read_newsletters(session: SessionDep, skip: int = 0, limit: int = 100) -> An
     response_model=CreateTag
 )
 def create_section(*, session: SessionDep, section_in: CreateTag) -> Any:
-    section = article_tags.get_section_by_name(session=session, name=section_in.name)
+    section = session.exec(
+        select(Section)
+        .where(Section.name == section_in.name)
+    ).first()
     if section:
         raise HTTPException(
             status_code=400,
@@ -163,4 +166,3 @@ def delete_newsletter(
     
     session.delete(db_newsletter)
     session.commit()
-    

@@ -121,6 +121,45 @@ class TestArticleController(unittest.TestCase):
         self.assertIsNotNone(articles[1]['article_id'])
         self.assertEqual(articles[1]['content'], "Second article")
 
+    def test_update_article_success(self):
+        """
+        Test updating an article that exists.
+        """
+        self.controller.add(self.test_article)
+        updates = {"content": "Updated content"}
+        result = self.controller.update_article(str(self.test_article.article_id), updates)
+        self.assertTrue(result)
+
+        updated_article = self.controller.get_by_id(str(self.test_article.article_id))
+        self.assertEqual(updated_article["content"], "Updated content")
+
+    def test_update_article_not_found(self):
+        """
+        Test updating an article that does not exist.
+        """
+        fake_id = str(uuid.uuid4())
+        updates = {"content": "New content"}
+        result = self.controller.update_article(fake_id, updates)
+        self.assertFalse(result)
+
+    def test_delete_article_success(self):
+        """
+        Test deleting an article that exists.
+        """
+        self.controller.add(self.test_article)
+        result = self.controller.delete_article(str(self.test_article.article_id))
+        self.assertTrue(result)
+
+        deleted = self.controller.get_by_id(str(self.test_article.article_id))
+        self.assertIsNone(deleted)
+
+    def test_delete_article_not_found(self):
+        """
+        Test deleting an article that does not exist.
+        """
+        fake_id = str(uuid.uuid4())
+        result = self.controller.delete_article(fake_id)
+        self.assertFalse(result)
 
 if __name__ == '__main__':
     unittest.main()

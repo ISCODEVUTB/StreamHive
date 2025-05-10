@@ -229,5 +229,24 @@ class TestMovieListController(unittest.TestCase):
         self.assertFalse(exp)
 
 
+    @patch("os.path.exists", return_value=True)
+    @patch("json.dump")
+    @patch("builtins.open", new_callable=mock_open)
+    def test_flush_list(self, mock_open_file, mock_json_dump, mock_exists):
+        controller = MovieListController()
+
+        # Ejecutar el método
+        result = controller.flush_list()
+
+        # Verificar que el resultado sea True
+        self.assertTrue(result)
+
+        # Verificar que se abrió el archivo al menos una vez
+        mock_open_file.assert_called_once_with(controller.file, "w", encoding="utf-8")
+
+        # Verificar que se haya escrito una lista vacía
+        mock_json_dump.assert_called_once_with([], mock_open_file(), indent=4)
+
+
 if __name__ == '__main__':
     unittest.main()

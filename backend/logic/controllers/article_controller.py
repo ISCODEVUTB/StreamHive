@@ -24,15 +24,15 @@ class ArticleController:
 
         try:
             with open(self.file, 'r+', encoding='utf-8') as f:
-                data = json.load(f)
+                content = f.read().strip()
+                data = json.loads(content) if content else []
                 data.append(new_article.to_dict())
                 f.seek(0)
                 f.truncate()
                 json.dump(data, f, indent=4)
             return new_article.article_id
         except Exception as e:
-            print(f"Error al agregar articulo: {e}")
-            return ""
+            raise Exception(f"Error al agregar articulo: {e}")
 
     def get_all(self):
         try:
@@ -89,5 +89,4 @@ class ArticleController:
                 json.dump(data, f, indent=4)
                 return True
         except Exception as e:
-            print(f"Error al eliminar artículo con ID '{article_id}': {e}")
-            return False
+            raise Exception()

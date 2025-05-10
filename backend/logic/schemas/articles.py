@@ -32,12 +32,23 @@ class BodyArticle(SQLModel):
     Model representing the Article entity.
 
     Attributes:
-        article_id: ID of the article.
         content: The textual content of the article.
         image_rel_url: Location of the image used for the article 
     """
     content: str
     image_rel_url: str
+
+
+class UpdateBodyArticle(SQLModel):
+    """
+    Model representing the Article entity.
+
+    Attributes:
+        content: The textual content of the article.
+        image_rel_url: Location of the image used for the article 
+    """
+    content: str | None = None
+    image_rel_url: str | None = None
 
 
 class UpdateArticle(SQLModel):
@@ -65,9 +76,11 @@ class ArticlePublicEXT(ArticleBase):
         newsletter (str): Name of the associated newsletter.
     """
     article_id: uuid.UUID
+    author: str
     created_at: datetime
     section: str
-    newsletter: str
+    newsletter: str | None = None
+    body: list = []
 
 
 class ArticlePublic(ArticleBase):
