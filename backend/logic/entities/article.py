@@ -72,8 +72,10 @@ class Article:
     def to_dict(self):
         return dict(
             article_id=str(self.article_id),
-            content=self.content,
-            image_rel_url = self.image_rel_url
+            body=dict(
+                content=self.content,
+                image_rel_url = self.image_rel_url
+            )
         )
     
     def __str__(self):

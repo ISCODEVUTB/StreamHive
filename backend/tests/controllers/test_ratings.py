@@ -4,41 +4,13 @@ from sqlmodel import Session
 from sqlmodel import func, select
 
 from backend.logic.models import Rating
-from backend.logic.enum import ProfileRoles, UserTypes, UserGender
-from backend.logic.controllers import users, profiles, ratings
+from backend.logic.controllers import ratings
 from backend.logic.schemas.ratings import (
     CreateRating,
     ProfileRatingsPublic, 
     MovieRatingsPublic
 )
-from backend.logic.schemas.users import CreateUser
-from backend.logic.schemas.profiles import CreateProfile
-from backend.tests.utils.utils import random_email, random_lower_string, random_birth_date
-
-full_name='User Example'
-gender=UserGender.OTHER
-user_type=UserTypes.EXTERNAL
-
-
-def user_and_profile_in(db: Session):  
-    user_in = CreateUser(
-        full_name=full_name,
-        email=random_email(), 
-        password =random_lower_string(),
-        birth_date=random_birth_date(),
-        user_gender=gender,
-        user_type=user_type
-    )
-    
-    user = users.create_user(session=db, user_create=user_in)
-
-    profile_in = CreateProfile(
-        username=random_lower_string(),
-        profile_role=ProfileRoles.SUBSCRIBER
-    )
-    profile = profiles.create_profile(session=db, profile_create=profile_in, user_id=user.user_id)
-
-    return user, profile
+from backend.tests.utils.user import user_and_profile_in
 
 
 def test_create_or_update_rating(db: Session) -> None:

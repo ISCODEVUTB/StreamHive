@@ -57,6 +57,7 @@ def update_section(*, session: Session, db_tag: Section, tag_in: UpdateTag) -> A
     tag_data = tag_in.model_dump(exclude_unset=True)
     extra_data = {}
     db_tag.sqlmodel_update(tag_data, update=extra_data)
+    print("db_tag:", db_tag, type(db_tag))
     session.add(db_tag)
     session.commit()
     session.refresh(db_tag)

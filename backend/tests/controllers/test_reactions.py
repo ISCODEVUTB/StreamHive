@@ -1,35 +1,11 @@
-import pytest
 from sqlmodel import Session
-from uuid import uuid4
 
 from backend.logic.models import Reaction
 from backend.logic.enum import TargetTypes
-from backend.logic.controllers import comments, profiles, reactions, users
+from backend.logic.controllers import comments, reactions
 from backend.logic.schemas.comments import CreateComment
-from backend.logic.schemas.profiles import CreateProfile
-from backend.logic.schemas.users import CreateUser
-from backend.tests.utils.utils import random_birth_date, random_email, random_lower_string
-
-
-def user_and_profile_in(db: Session):  
-    user_create = CreateUser(
-        email=random_email(), 
-        password =random_lower_string(),
-        birth_date=random_birth_date(),
-        full_name='User Example',
-        user_gender="other",
-        user_type="external"
-    )
-
-    user = users.create_user(session=db, user_create=user_create)
-
-    profile_create = CreateProfile(
-        username=random_lower_string()
-    )
-
-    profile = profiles.create_profile(session=db, profile_create=profile_create, user_id=user.user_id)
-
-    return user, profile
+from backend.tests.utils.user import user_and_profile_in
+from backend.tests.utils.utils import random_lower_string
 
 
 def test_create_reaction_commment(db: Session) -> None:

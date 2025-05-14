@@ -69,5 +69,5 @@ class NewslettersPublic(SQLModel):
         newsletters (List[SectionPublic]): List of newsletters.
         count (int): Total number of newsletters.
     """
-    newsletters: list[SectionPublic]
+    newsletters: list[NewsletterPublic]
     count: int

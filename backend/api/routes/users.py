@@ -234,7 +234,7 @@ def update_user(
     dependencies=[Depends(get_current_active_admin)],
     response_model=Message
 )
-def delete_user(
+def delete_user_definitely(
     session: SessionDep,
     user_id: uuid.UUID
 ) -> Message:

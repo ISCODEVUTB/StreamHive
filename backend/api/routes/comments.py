@@ -42,7 +42,7 @@ def get_my_comments(
 
 
 @router.post(
-    "/t/{target_type}/{target_id}/p/{profile_id}", 
+    "/t/{target_type}/{target_id}", 
     response_model=CommentPublic,
     dependencies=[Depends(get_current_user)]
 )
@@ -101,7 +101,7 @@ def delete_comment(
     session.delete(comment)
     session.commit()
 
-    return Message(message='Reaction deleted successfully')
+    return Message(message='Comment deleted successfully')
 
 
 @router.get(

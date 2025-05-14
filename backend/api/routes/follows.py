@@ -18,7 +18,7 @@ router = APIRouter(prefix="/follows", tags=["follows"])
 
 
 @router.post(
-    "/",  
+    "/{following_id}",  
     dependencies=[Depends(get_current_user)],
     response_model=Follow
 )
@@ -101,16 +101,16 @@ def read_profiles_following(session: SessionDep, current_user: CurrentUser) -> F
 
 
 @router.get(
-    "/profile/{follower_id}/followers",
+    "/profile/{profile_id}/followers",
     dependencies=[Depends(get_current_user)],
     response_model=FollowersPublic,
 )
-def read_profiles_followers(session: SessionDep, follower_id: uuid.UUID) -> FollowersPublic:
+def read_other_profiles_followers(session: SessionDep, profile_id: uuid.UUID) -> FollowersPublic:
     """
     Get all followers for a given profile.
     """
     followers = follows.get_profile_followers(
-        session=session, profile_id=follower_id
+        session=session, profile_id=profile_id
     )
 
     if not followers:
@@ -120,16 +120,16 @@ def read_profiles_followers(session: SessionDep, follower_id: uuid.UUID) -> Foll
 
 
 @router.get(
-    "/profile/{follower_id}/following",
+    "/profile/{profile_id}/following",
     dependencies=[Depends(get_current_user)],
     response_model=FollowingPublic,
 )
-def read_profiles_following(session: SessionDep, follower_id: uuid.UUID) -> FollowingPublic:
+def read_other_profiles_following(session: SessionDep, profile_id: uuid.UUID) -> FollowingPublic:
     """
     Get all profiles that a given profile is following.
     """
     followings = follows.get_profile_following(
-        session=session, profile_id=follower_id
+        session=session, profile_id=profile_id
     )
 
     if not followings:

@@ -3,37 +3,12 @@ import pytest
 from sqlmodel import Session
 
 from backend.logic.models import AuthorArticle
-from backend.logic.controllers import article_tags, users, articles, profiles, authors_articles
+from backend.logic.controllers import article_tags, articles, authors_articles
 from backend.logic.schemas.articles import CreateArticle
 from backend.logic.schemas.articles_tags import CreateTag
 from backend.logic.schemas.author_articles import CreateAuthor, UpdateAuthor
-from backend.logic.schemas.profiles import CreateProfile
-from backend.logic.schemas.users import CreateUser
-from backend.logic.enum import UserTypes, UserGender, ProfileRoles
-from backend.tests.utils.utils import random_email, random_lower_string, random_birth_date
-
-
-full_name = "Test User"
-gender = UserGender.OTHER
-user_type = UserTypes.EXTERNAL
-
-
-def create_test_profile(db: Session):
-    user_in = CreateUser(
-        full_name=full_name,
-        email=random_email(),
-        password=random_lower_string(),
-        birth_date=random_birth_date(),
-        user_gender=gender,
-        user_type=user_type
-    )
-    user = users.create_user(session=db, user_create=user_in)
-
-    profile_create = CreateProfile(
-        username=random_lower_string(),
-        profile_role=ProfileRoles.SUBSCRIBER
-    )
-    return profiles.create_profile(session=db, profile_create=profile_create, user_id=user.user_id)
+from backend.tests.utils.user import user_and_profile_in
+from backend.tests.utils.utils import random_lower_string
 
 
 def create_test_article(db: Session):
@@ -51,7 +26,7 @@ def create_test_article(db: Session):
 
 
 def test_get_author_articles_by_profile_id(db: Session) -> None:
-    profile = create_test_profile(db)
+    _, profile = user_and_profile_in(db)
     article = create_test_article(db)
 
     author_in = CreateAuthor(profile_id=profile.profile_id, article_id=article.article_id, main_author=True)
@@ -65,7 +40,7 @@ def test_get_author_articles_by_profile_id(db: Session) -> None:
 
 
 def test_get_author_articles_by_article_id(db: Session) -> None:
-    profile = create_test_profile(db)
+    _, profile = user_and_profile_in(db)
     article = create_test_article(db)
 
     author_in = CreateAuthor(profile_id=profile.profile_id, article_id=article.article_id, main_author=True)
@@ -90,7 +65,7 @@ def test_get_author_articles_empty(db: Session) -> None:
 
 
 def test_create_author_article(db: Session) -> None:
-    profile = create_test_profile(db)
+    _, profile = user_and_profile_in(db)
     article = create_test_article(db)
 
     author_in = CreateAuthor(profile_id=profile.profile_id, article_id=article.article_id, main_author=True)
@@ -102,7 +77,7 @@ def test_create_author_article(db: Session) -> None:
 
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_update_author_article_main_author(db: Session) -> None:
-    profile = create_test_profile(db)
+    _, profile = user_and_profile_in(db)
     article = create_test_article(db)
 
     author_in = CreateAuthor(profile_id=profile.profile_id, article_id=article.article_id)
@@ -124,7 +99,7 @@ def test_update_author_article_main_author(db: Session) -> None:
 
 
 def test_delete_author_article(db: Session) -> None:
-    profile = create_test_profile(db)
+    _, profile = user_and_profile_in(db)
     article = create_test_article(db)
 
     author_in = CreateAuthor(profile_id=profile.profile_id, article_id=article.article_id)

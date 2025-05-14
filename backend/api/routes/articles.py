@@ -7,9 +7,13 @@ from sqlmodel import func, select
 from backend.logic.models import (
     Article,
     Profile,
-    AuthorArticle
+    AuthorArticle,
+    Section,
+    Newsletter
 )
+from backend.logic.models.users import User
 from backend.logic.schemas.articles import (
+    ArticlePublicEXT,
     CreateArticle,
     BodyArticle,
     UpdateArticle,
@@ -23,6 +27,7 @@ from backend.logic.entities.article import Article as EntityArticle
 from backend.logic.controllers import articles, article_controller, authors_articles
 from backend.logic.schemas.author_articles import CreateAuthor
 from backend.api.deps import CurrentUser, SessionDep, get_current_active_internal_or_admin
+from backend.api.schemas import Message
 
 
 router = APIRouter(prefix="/articles", tags=["article"])
@@ -87,20 +92,49 @@ def create_article(
     return article
 
 
-@router.get("/{article_id}", response_model=ArticlePublic)
+@router.get("/{article_id}", response_model=ArticlePublicEXT)
 def read_article_by_id(
     article_id: uuid.UUID, 
     session: SessionDep
 ) -> Any:
-    article = session.get(Article, article_id)
-
+    article: Article = session.get(Article, article_id)
     if not article:
-        raise HTTPException(
-            status_code=404, 
-            detail="Article not found"
-        )
-    
-    return article
+        raise HTTPException(status_code=404, detail="Article not found")
+
+    section = session.get(Section, article.section_id)
+    section_name = section.name if section else None
+    if not section:
+        raise HTTPException(status_code=500, detail="Section not found")
+
+    newsletter_name = None
+    if article.newsletter_id:
+        newsletter = session.get(Newsletter, article.newsletter_id)
+        newsletter_name = newsletter.name if newsletter else None
+        if not newsletter:
+            raise HTTPException(status_code=500, detail="Newsletter not found")
+
+    author = session.exec(
+        select(User.full_name)
+        .join(Profile, User.user_id == Profile.profile_id)
+        .join(AuthorArticle, Profile.profile_id == AuthorArticle.profile_id)
+        .where(AuthorArticle.article_id == article_id)
+    ).first()
+
+    author_name = author or "Unknown"
+
+    body_article = article_controller.ArticleController().get_by_id(str(article_id))
+    body_content = body_article.get("body", []) if body_article else []
+
+    return ArticlePublicEXT(
+        article_id=article.article_id,
+        article_title=article.article_title,
+        movie_ref_id=article.movie_ref_id,
+        created_at=article.created_at,
+        section=section_name,
+        newsletter=newsletter_name,
+        author=author_name,
+        body=body_content
+    )
 
 
 @router.patch(
@@ -160,7 +194,8 @@ def update_article(
 
 @router.delete(
     "/{article_id}", 
-    dependencies=[Depends(get_current_active_internal_or_admin)]
+    dependencies=[Depends(get_current_active_internal_or_admin)],
+    response_model=Message
 )
 def delete_article(
     session: SessionDep, 
@@ -196,9 +231,10 @@ def delete_article(
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Could not delete movie list: {e}"
+            detail=f"Could not delete article: {e}"
         )
 
     session.delete(db_article_author)
     session.delete(db_article)
     session.commit()
+    return Message(message='Article deleted successfully')

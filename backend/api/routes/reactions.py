@@ -19,8 +19,33 @@ from backend.api.schemas import Message
 router = APIRouter(prefix="/reactions", tags=["interactions"])
 
 
+@router.get(
+    "/t/{target_type}/my-reactions", 
+    dependencies=[Depends(get_current_user)],
+    response_model=ProfilesReactions
+)
+def get_my_reactions(
+    *,
+    target_type: TargetTypes, 
+    session: SessionDep,
+    current_user: CurrentUser
+) -> None:
+    statement = select(Profile).where(Profile.user_id == current_user.user_id)
+    profile_in: Profile = session.exec(statement).first()
+    profile_id = profile_in.profile_id
+
+    db_objs: list[Reaction] = reactions.get_reactions_by_profile(
+        session=session, profile_id=profile_id, target_type=target_type
+    )
+    liked = [
+        ReactionPublic(target_id=r.target_id, target_type=r.target_type)
+        for r in db_objs
+    ]
+    return ProfilesReactions(profile_id=profile_id, liked=liked, count=len(liked))
+
+
 @router.post(
-    "/{target_type}/{target_id}", 
+    "/t/{target_type}/{target_id}", 
     response_model=ReactionPublic, 
     dependencies=[Depends(get_current_user)])
 def create_reaction(
@@ -55,45 +80,13 @@ def create_reaction(
 
 
 @router.get(
-    "/t/movies/profile/{profile_id}", 
+    "/t/{target_type}/profile/{profile_id}", 
     dependencies=[Depends(get_current_user)],
     response_model=ProfilesReactions
 )
-def get_movie_reactions_by_profile(profile_id: uuid.UUID, session: SessionDep):
+def get_reactions_by_profile(*, profile_id: uuid.UUID, target_type: TargetTypes, session: SessionDep):
     db_objs: list[Reaction] = reactions.get_reactions_by_profile(
-        session=session, profile_id=profile_id, target_type=TargetTypes.MOVIE
-    )
-    liked = [
-        ReactionPublic(target_id=r.target_id, target_type=r.target_type)
-        for r in db_objs
-    ]
-    return ProfilesReactions(profile_id=profile_id, liked=liked, count=len(liked))
-
-
-@router.get(
-    "/t/comments/profile/{profile_id}", 
-    dependencies=[Depends(get_current_user)],
-    response_model=ProfilesReactions
-)
-def get_comments_reactions_by_profile(profile_id: uuid.UUID, session: SessionDep):
-    db_objs: list[Reaction] = reactions.get_reactions_by_profile(
-        session=session, profile_id=profile_id, target_type=TargetTypes.COMMENT
-    )
-    liked = [
-        ReactionPublic(target_id=r.target_id, target_type=r.target_type)
-        for r in db_objs
-    ]
-    return ProfilesReactions(profile_id=profile_id, liked=liked, count=len(liked))
-
-
-@router.get(
-    "/t/articles/profile/{profile_id}", 
-    dependencies=[Depends(get_current_user)],
-    response_model=ProfilesReactions
-)
-def get_articles_reactions_by_profile(profile_id: uuid.UUID, session: SessionDep):
-    db_objs: list[Reaction] = reactions.get_reactions_by_profile(
-        session=session, profile_id=profile_id, target_type=TargetTypes.ARTICLE
+        session=session, profile_id=profile_id, target_type=target_type
     )
     liked = [
         ReactionPublic(target_id=r.target_id, target_type=r.target_type)

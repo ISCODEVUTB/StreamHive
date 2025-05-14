@@ -80,7 +80,7 @@ class ArticlePublicEXT(ArticleBase):
     created_at: datetime
     section: str
     newsletter: str | None = None
-    body: list = []
+    body: dict
 
 
 class ArticlePublic(ArticleBase):
@@ -90,6 +90,7 @@ class ArticlePublic(ArticleBase):
     Attributes:
         article_id (uuid.UUID): Unique identifier for the article.
         created_at (datetime): Timestamp of article creation.
+        image_rel_url: Location of the image used for the article 
     """
     article_id: uuid.UUID
     created_at: datetime

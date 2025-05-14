@@ -62,7 +62,7 @@ class ArticleController:
 
                 for i, article in enumerate(data):
                     if article['article_id'] == article_id:
-                        data[i].update(updates)
+                        data[i]['body'].update(updates)
                         f.seek(0)
                         f.truncate()
                         json.dump(data, f, indent=4)
@@ -90,3 +90,12 @@ class ArticleController:
                 return True
         except Exception as e:
             raise Exception()
+        
+    def flush_list(self) -> bool:
+        try:
+            with open(self.file, "w", encoding="utf-8") as f:
+                json.dump([], f, indent=4)
+            return True
+        except Exception as e:
+            print(f"Error al vaciar la lista: {e}")
+            return False

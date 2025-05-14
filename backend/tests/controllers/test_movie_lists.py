@@ -3,32 +3,10 @@ import pytest
 from sqlmodel import Session
 
 from backend.logic.models import MovieList
-from backend.logic.controllers import users, profiles, movie_lists
-from backend.logic.schemas.users import CreateUser
-from backend.logic.schemas.profiles import CreateProfile
+from backend.logic.controllers import movie_lists
 from backend.logic.schemas.movie_lists import CreateMovieList, UpdateMovieList
-from backend.tests.utils.utils import random_email, random_lower_string, random_birth_date
-
-
-def user_and_profile_in(db: Session):  
-    user_create = CreateUser(
-        email=random_email(), 
-        password =random_lower_string(),
-        birth_date=random_birth_date(),
-        full_name='User Example',
-        user_gender="other",
-        user_type="external"
-    )
-
-    user = users.create_user(session=db, user_create=user_create)
-
-    profile_create = CreateProfile(
-        username=random_lower_string()
-    )
-
-    profile = profiles.create_profile(session=db, profile_create=profile_create, user_id=user.user_id)
-
-    return user, profile
+from backend.tests.utils.utils import random_lower_string
+from backend.tests.utils.user import user_and_profile_in
 
 
 def test_create_movie_list(db: Session) -> None:

@@ -7,9 +7,7 @@ from sqlmodel import func, select
 from backend.logic.models import Rating, Profile
 from backend.logic.schemas.ratings import (
     CreateRating,
-    ProfileRating, 
     ProfileRatingsPublic, 
-    MovieRating, 
     MovieRatingsPublic
 )
 from backend.logic.controllers import ratings
@@ -21,7 +19,7 @@ router = APIRouter(prefix="/ratings", tags=["ratings"])
 
 
 @router.post(
-    "/",
+    "/movie/{movie_id}",
     dependencies=[Depends(get_current_user)],
     response_model=Rating
 )
@@ -107,25 +105,26 @@ def read_ratings_by_movie_id(
     return ratings.get_ratings_by_movie_id(session=session, movie_id=movie_id)
 
 
-@router.get("/movie/{movie_id}/average", response_model=float)
+@router.get("/movie/{movie_id}/average", response_model=dict[str, float])
 def get_average_rating_for_movie(
     *,
     session: SessionDep,
     movie_id: str
-) -> float:
+) -> dict[str, float]:
     """
     Retrieve the average rating for a specific movie.
     """
     avg = session.exec(
         select(func.avg(Rating.rate)).where(Rating.movie_id == movie_id)
-    ).first()
+    ).one_or_none()
     
     average = avg if avg is not None else 0.0
-    return round(average, 2)
+    return {'avg_rate': round(average, 2)}
 
 
 @router.delete(
     "/movie/{movie_id}/profile/{profile_id}",
+    dependencies=[Depends(get_current_user)],
     response_model=Message
 )
 def delete_rating(

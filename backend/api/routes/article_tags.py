@@ -1,7 +1,6 @@
-import uuid
 from typing import Any, Annotated
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import func, select
 
 from backend.logic.models import (
@@ -17,7 +16,8 @@ from backend.logic.schemas.articles_tags import (
     NewslettersPublic
 )
 from backend.logic.controllers import article_tags
-from backend.api.deps import SessionDep
+from backend.api.deps import SessionDep, get_current_active_internal_or_admin
+from backend.api.schemas import Message
 
 
 router = APIRouter(prefix="/articles/t", tags=["article"])
@@ -26,7 +26,7 @@ msg_n = "The newsletter with this id does not exist in the system"
 
 @router.get(
     "/sections",
-    response_model=SectionsPublic,
+    response_model=SectionsPublic
 )
 def read_sections(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
     count_statement = select(func.count()).select_from(Section)
@@ -38,8 +38,8 @@ def read_sections(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
     return SectionsPublic(sections=sections, count=count)
 
 @router.get(
-    "/newsletters",
-    response_model=NewslettersPublic,
+    "/newsletters", 
+    response_model=NewslettersPublic
 )
 def read_newsletters(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
     count_statement = select(func.count()).select_from(Newsletter)
@@ -53,6 +53,7 @@ def read_newsletters(session: SessionDep, skip: int = 0, limit: int = 100) -> An
 
 @router.post(
     "/sections", 
+    dependencies=[Depends(get_current_active_internal_or_admin)],
     response_model=CreateTag
 )
 def create_section(*, session: SessionDep, section_in: CreateTag) -> Any:
@@ -71,10 +72,14 @@ def create_section(*, session: SessionDep, section_in: CreateTag) -> Any:
 
 @router.post(
     "/newsletters", 
+    dependencies=[Depends(get_current_active_internal_or_admin)],
     response_model=CreateTag
 )
 def create_newsletter(*, session: SessionDep, newsletter_in: CreateTag) -> Any:
-    newsletter = article_tags.get_newsletter_by_name(session=session, name=newsletter_in.name)
+    newsletter = session.exec(
+        select(Newsletter)
+        .where(Newsletter.name == newsletter_in.name)
+    ).first()    
     if newsletter:
         raise HTTPException(
             status_code=400,
@@ -85,14 +90,12 @@ def create_newsletter(*, session: SessionDep, newsletter_in: CreateTag) -> Any:
 
 
 @router.patch(
-    "/sections",
-    response_model=SectionPublic,
+    "/sections/{section_id}",
+    dependencies=[Depends(get_current_active_internal_or_admin)],
+    response_model=SectionPublic
 )
 def update_section(
-    *,
-    session: SessionDep,
-    section_id: uuid.UUID,
-    section_in: UpdateTag,
+    *, session: SessionDep, section_id: int, section_in: UpdateTag,
 ) -> Any:
     
     db_section = session.get(Section, section_id)
@@ -102,19 +105,17 @@ def update_section(
             detail=msg_s,
         )
 
-    db_section = article_tags.update_section(session=SessionDep, db_tag=db_section, tag_in=section_in)
+    db_section = article_tags.update_section(session=session, db_tag=db_section, tag_in=section_in)
     return db_section
 
 
 @router.patch(
-    "/newsletters",
-    response_model=NewsletterPublic,
+    "/newsletters/{newsletter_id}",
+    dependencies=[Depends(get_current_active_internal_or_admin)],
+    response_model=NewsletterPublic
 )
 def update_newsletter(
-    *,
-    session: SessionDep,
-    newsletter_id: uuid.UUID,
-    newsletter_in: UpdateTag,
+    *, session: SessionDep, newsletter_id: int, newsletter_in: UpdateTag,
 ) -> Any:
     
     db_newsletter = session.get(Newsletter, newsletter_id)
@@ -124,19 +125,16 @@ def update_newsletter(
             detail=msg_n,
         )
 
-    db_newsletter = article_tags.update_newsletter(session=SessionDep, db_tag=db_newsletter, tag_in=newsletter_in)
+    db_newsletter = article_tags.update_newsletter(session=session, db_tag=db_newsletter, tag_in=newsletter_in)
     return db_newsletter
 
 
 @router.delete(
-    "/sections", 
-#    dependencies=[Depends(get_current_active_superuser)]
+    "/sections/{section_id}", 
+    dependencies=[Depends(get_current_active_internal_or_admin)],
+    response_model=Message
 )
-def delete_section(
-    session: SessionDep,
-    section_id: uuid.UUID,
-) -> Any:
-    
+def delete_section(*, session: SessionDep, section_id: int) -> Any:
     db_section = session.get(Section, section_id)
     if not db_section:
         raise HTTPException(
@@ -146,17 +144,15 @@ def delete_section(
     
     session.delete(db_section)
     session.commit()
+    return Message(message='Section deleted successfully')
 
 
 @router.delete(
-    "/newsletters", 
-#    dependencies=[Depends(get_current_active_superuser)]
+    "/newsletters/{newsletter_id}", 
+    dependencies=[Depends(get_current_active_internal_or_admin)],
+    response_model=Message
 )
-def delete_newsletter(
-    session: SessionDep,
-    newsletter_id: uuid.UUID,
-) -> Any:
-    
+def delete_newsletter(*, session: SessionDep, newsletter_id: int) -> Any:
     db_newsletter = session.get(Newsletter, newsletter_id)
     if not db_newsletter:
         raise HTTPException(
@@ -166,3 +162,4 @@ def delete_newsletter(
     
     session.delete(db_newsletter)
     session.commit()
+    return Message(message='Newsletter deleted successfully')

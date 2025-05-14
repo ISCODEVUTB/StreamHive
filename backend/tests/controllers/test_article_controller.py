@@ -47,7 +47,7 @@ class TestArticleController(unittest.TestCase):
             data = json.load(f)
 
         self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]['content'], "Test article content")
+        self.assertEqual(data[0]['body']['content'], "Test article content")
 
     def test_add_invalid_object(self):
         """
@@ -119,7 +119,7 @@ class TestArticleController(unittest.TestCase):
         articles = self.controller.get_all()
         self.assertEqual(len(articles), 2)
         self.assertIsNotNone(articles[1]['article_id'])
-        self.assertEqual(articles[1]['content'], "Second article")
+        self.assertEqual(articles[1]['body']['content'], "Second article")
 
     def test_update_article_success(self):
         """
@@ -131,7 +131,7 @@ class TestArticleController(unittest.TestCase):
         self.assertTrue(result)
 
         updated_article = self.controller.get_by_id(str(self.test_article.article_id))
-        self.assertEqual(updated_article["content"], "Updated content")
+        self.assertEqual(updated_article['body']["content"], "Updated content")
 
     def test_update_article_not_found(self):
         """
@@ -160,6 +160,13 @@ class TestArticleController(unittest.TestCase):
         fake_id = str(uuid.uuid4())
         result = self.controller.delete_article(fake_id)
         self.assertFalse(result)
+    
+    
+    def test_flush_list(self):
+        controller = ArticleController()
+        result = controller.flush_list()
+
+        self.assertTrue(result)
 
 if __name__ == '__main__':
     unittest.main()

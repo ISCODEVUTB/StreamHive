@@ -4,32 +4,10 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session, select
 
 from backend.core.config import settings
-from backend.logic.controllers import profiles, users
-from backend.logic.models import User, Profile
-from backend.logic.schemas.profiles import CreateProfile
-from backend.logic.schemas.users import CreateUser
-from backend.tests.utils.utils import random_birth_date, random_email, random_lower_string
-
-
-def user_and_profile_in(db: Session):  
-    user_create = CreateUser(
-        email=random_email(), 
-        password =random_lower_string(),
-        birth_date=random_birth_date(),
-        full_name='User Example',
-        user_gender="other",
-        user_type="external"
-    )
-
-    user = users.create_user(session=db, user_create=user_create)
-
-    profile_create = CreateProfile(
-        username=random_lower_string()
-    )
-
-    profile = profiles.create_profile(session=db, profile_create=profile_create, user_id=user.user_id)
-
-    return user, profile
+from backend.logic.controllers import profiles
+from backend.logic.models import Profile
+from backend.tests.utils.user import user_and_profile_in
+from backend.tests.utils.utils import random_lower_string
 
 
 def test_create_my_profile(
