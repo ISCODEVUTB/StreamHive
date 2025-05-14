@@ -1,19 +1,19 @@
 FROM python:3.11-slim
 
-# Establece el directorio de trabajo dentro del contenedor
+# Establece el directorio de trabajo en el contenedor
 WORKDIR /app
 
-# Copia el archivo de dependencias desde la raíz
-COPY requirements.txt .
+# Copia solo el archivo de dependencias
+COPY backend/requirements.txt .
 
 # Instala las dependencias
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copia solo la carpeta del backend al contenedor
-COPY backend/ /app
+# Copia todo el backend (incluyendo app, lógica y la carpeta db)
+COPY backend /app/backend
 
-# Expone el puerto que usará Uvicorn
+# Expone el puerto
 EXPOSE 8000
 
-# Comando para ejecutar la app (ajusta si usas otro archivo)
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Comando para iniciar el servidor
+CMD ["uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "8000"]
