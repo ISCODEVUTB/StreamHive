@@ -16,4 +16,4 @@ COPY backend /app/backend
 EXPOSE 8000
 
 # Comando para iniciar el servidor
-CMD ["sh", "-c", "python backend/initial_data.py && uvicorn backend.app:app --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "export PYTHONPATH=/app && python backend/initial_data.py && uvicorn backend.app:app --host 0.0.0.0 --port 8000"]
