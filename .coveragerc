@@ -6,3 +6,4 @@ omit =
     backend/logic/schemas/*
     backend/tests/conftest.py
     backend/tests/utils/*
+    backend/tests/api/*
