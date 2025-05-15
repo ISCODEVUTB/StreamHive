@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import secrets
 from typing import Annotated, Any, Literal
@@ -14,6 +15,8 @@ from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict # type: ignore
 from typing_extensions import Self
 
+env = os.getenv("ENVIRONMENT", "local")
+env_file = f".env.{env}" if Path(f".env.{env}").exists() else None
 
 def parse_cors(v: Any) -> list[str] | str:
     if isinstance(v, str) and not v.startswith("["):
@@ -25,8 +28,7 @@ def parse_cors(v: Any) -> list[str] | str:
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        # Use top level .env file (one level above ./backend/)
-        env_file=Path(__file__).resolve().parents[2] / ".env",
+        env_file=env_file,
         env_ignore_empty=True,
         extra="ignore",
     )
