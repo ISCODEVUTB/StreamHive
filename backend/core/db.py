@@ -19,6 +19,7 @@ from backend.logic.schemas.users import CreateUser
 from backend.logic.enum import UserTypes, UserGender
 from backend.logic.controllers import profiles, users
 from backend.data.data import user_test_lists, profile_list_test
+from backend.core.config import settings
 
 
 # RUTA ABSOLUTA A LA DB
@@ -27,7 +28,7 @@ DB_PATH = BASE_DIR / "data" / "thehive.db"
 
 DATABASE_URL = f"sqlite:///{DB_PATH}"
 
-engine = create_engine(DATABASE_URL, echo=False)
+engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 test_engine = create_engine(DATABASE_URL, echo=True)
 
 def init_db(session: Session):
