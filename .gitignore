@@ -1,5 +1,7 @@
 __pycache__/
 *.py[cod]
 *.pyo
-.coverage
-.txt
+*.coverage
+*.txt
+*.env.local
+*.env.prod
