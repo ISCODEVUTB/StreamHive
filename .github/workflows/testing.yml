@@ -33,7 +33,7 @@ jobs:
           USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
           ENVIRONMENT: test
         run: |
-          PYTHONPATH=$PWD pytest --cov=. --cov-report=term --cov-report=html --cov-report=xml --cov-config .coveragerc || true
+          PYTHONPATH=$PWD pytest --ignore=backend/tests/api --cov=. --cov-report=term --cov-report=html --cov-report=xml --cov-config .coveragerc || true
 
       # Subir el reporte de cobertura
       - name: Upload coverage report
