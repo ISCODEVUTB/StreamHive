@@ -60,7 +60,7 @@ def test_create_follow_myself(
         headers=superuser_token_headers
     )
 
-    assert 400
+    assert r.status_code == 400
     assert r.json()['detail'] == "A user cannot follow themselves."
 
 

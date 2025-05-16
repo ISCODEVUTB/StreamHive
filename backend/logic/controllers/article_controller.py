@@ -32,7 +32,7 @@ class ArticleController:
                 json.dump(data, f, indent=4)
             return new_article.article_id
         except Exception as e:
-            raise Exception(f"Error al agregar articulo: {e}")
+            raise RuntimeError(f"Error al agregar articulo: {e}")
 
     def get_all(self):
         try:
@@ -89,7 +89,7 @@ class ArticleController:
                 json.dump(data, f, indent=4)
                 return True
         except Exception as e:
-            raise Exception()
+            raise RuntimeError(f"Error al eliminar articulo: {e}")
         
     def flush_list(self) -> bool:
         try:
