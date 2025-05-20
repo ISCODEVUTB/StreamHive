@@ -30,8 +30,8 @@ def test_create_comment(db: Session):
 def test_get_comments_by_target(db: Session):
     _, profile = user_and_profile_in(db)
     comment_in = CreateComment(content="Sample Comment Target", has_spoilers=True)
-    target_id = uuid.uuid4()
-    target_type = TargetTypes.COMMENT
+    target_id = 'MovieID'
+    target_type = TargetTypes.MOVIE
 
     comments.create_comment(
         session=db,
@@ -54,13 +54,13 @@ def test_get_comments_by_target(db: Session):
 def test_get_comments_by_profile(db: Session):
     _, profile = user_and_profile_in(db)
     comment_in = CreateComment(content="Sample Comment Profile", has_spoilers=False)
-    target_id = str(uuid.uuid4())
+    target_id = 'MovieID'
 
     comments.create_comment(
         session=db,
         comment_in=comment_in,
         profile_id=profile.profile_id,
-        target_type=TargetTypes.COMMENT,
+        target_type=TargetTypes.MOVIE,
         target_id=target_id,
     )
 
@@ -95,7 +95,7 @@ def test_create_comment_on_comment(db: Session):
     assert comment.target_type == TargetTypes.COMMENT
 
 
-def test_get_comments_by_target(db: Session):
+def test_get_various_comments_by_target(db: Session):
     _, profile = user_and_profile_in(db)
     movie_id = "tt6543210"
     comment_in = CreateComment(content="Another comment", has_spoilers=True)
@@ -119,7 +119,7 @@ def test_get_comments_by_target(db: Session):
     assert result[0].target_id == movie_id
 
 
-def test_get_comments_by_profile(db: Session):
+def test_get_various_comments_by_profile(db: Session):
     _, profile = user_and_profile_in(db)
     movie_id = "tt1111111"
     comment_in = CreateComment(content="Profile comment", has_spoilers=False)

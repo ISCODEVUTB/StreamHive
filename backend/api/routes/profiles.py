@@ -52,6 +52,11 @@ def create_profile(*, session: SessionDep, profile_in: CreateProfile, current_us
         )
     try:
         profile = profiles.create_profile(session=session, profile_create=profile_in, user_id=current_user.user_id)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=409,
+            detail=str(e)
+        ) 
     except Exception as e:
         raise HTTPException(
             status_code=409,

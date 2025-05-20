@@ -2,8 +2,7 @@ import uuid
 from typing import Any
 from sqlmodel import Session, select
 
-from backend.core.security import get_password_hash, verify_password
-from backend.logic.models import Profile
+from backend.logic.models import Profile, User
 from backend.logic.schemas.profiles import CreateProfile, UpdateProfile
 
 
@@ -19,6 +18,16 @@ def create_profile(*, session: Session, profile_create: CreateProfile, user_id: 
     Returns:
         Profile: The newly created Profile object.
     """
+    user = session.get(User, user_id)
+    if not user:
+        raise ValueError("User not found.")
+
+    if user.user_type in ('internal', 'admin'):
+        profile_create.profile_role = 'editor'
+
+    if profile_create.profile_role == 'editor' and user.user_type not in ('internal', 'admin'):
+        raise ValueError("The profile role assigned does not match the user type.")
+
     db_obj = Profile.model_validate(
         profile_create, update={"user_id": user_id}
     )

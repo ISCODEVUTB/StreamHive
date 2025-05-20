@@ -35,6 +35,41 @@ def test_create_profile(db: Session) -> None:
     assert profile.profile_role == ProfileRoles.SUBSCRIBER
 
 
+def test_create_editor_profile_failed(db: Session) -> None:
+    user = users.create_user(session=db, user_create=user_in())
+    
+    profile_in = CreateProfile(
+        username=random_lower_string(),
+        profile_role=ProfileRoles.EDITOR
+    )
+    try:
+        profiles.create_profile(session=db, profile_create=profile_in, user_id=user.user_id)
+    except Exception as e:
+        assert e
+
+def test_create_editor_profile(db: Session) -> None:
+    user = users.create_user(
+        session=db, 
+        user_create=CreateUser(
+            email=random_email(), 
+            password =random_lower_string(),
+            birth_date=random_birth_date(),
+            full_name='User Example',
+            user_gender="other",
+            user_type="internal"
+        )
+    )
+    profile_in = CreateProfile(
+        username=random_lower_string(),
+        profile_role=ProfileRoles.EDITOR
+    )
+    profile = profiles.create_profile(session=db, profile_create=profile_in, user_id=user.user_id)
+
+    assert user.user_id == profile.user_id
+    assert profile.username == profile_in.username
+    assert profile.profile_role == ProfileRoles.EDITOR
+
+
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_check_if_profile_is_critic(db: Session) -> None:
     user = users.create_user(session=db, user_create=user_in())
@@ -55,24 +90,11 @@ def test_check_if_profile_is_critic(db: Session) -> None:
     assert profile_2.profile_role == ProfileRoles.CRITIC
 
 
-def test_check_if_profile_is_editor(db: Session) -> None:
-    user = users.create_user(session=db, user_create=user_in())
-    profile_in = CreateProfile(
-        username=random_lower_string(),
-        profile_role=ProfileRoles.EDITOR
-    )
-    profile = profiles.create_profile(session=db, profile_create=profile_in, user_id=user.user_id)
-
-    assert user.user_id == profile.user_id
-    assert profile.username == profile_in.username
-    assert profile.profile_role == ProfileRoles.EDITOR
-
-
 def test_get_profile(db: Session) -> None:
     user = users.create_user(session=db, user_create=user_in())
     profile_in = CreateProfile(
         username=random_lower_string(),
-        profile_role=ProfileRoles.EDITOR
+        profile_role=ProfileRoles.SUBSCRIBER
     )
     profile = profiles.create_profile(session=db, profile_create=profile_in, user_id=user.user_id)
     profile_2 = db.get(Profile, profile.profile_id)
@@ -87,7 +109,7 @@ def test_update_profile(db: Session) -> None:
     user = users.create_user(session=db, user_create=user_in())
     profile_in = CreateProfile(
         username=random_lower_string(),
-        profile_role=ProfileRoles.EDITOR
+        profile_role=ProfileRoles.SUBSCRIBER
     )
     profile = profiles.create_profile(session=db, profile_create=profile_in, user_id=user.user_id)
     
