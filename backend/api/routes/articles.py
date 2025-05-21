@@ -238,3 +238,63 @@ def delete_article(
     session.delete(db_article)
     session.commit()
     return Message(message='Article deleted successfully')
+
+
+@router.get(
+    "/section/{section_id}",
+    response_model=SectionArticles
+)
+def get_articles_by_section(section_id: uuid.UUID, session: SessionDep) -> Any:
+    section = session.get(Section, section_id)
+    if not section:
+        raise HTTPException(status_code=404, detail="Section not found")
+
+    articles_in_section = session.exec(
+        select(Article).where(Article.section_id == section_id)
+    ).all()
+
+    return SectionArticles(
+        section=section.name,
+        articles=articles_in_section,
+        count=len(articles_in_section)
+    )
+
+
+@router.get(
+    "/newsletter/{newsletter_id}",
+    response_model=NewsletterArticles
+)
+def get_articles_by_newsletter(newsletter_id: uuid.UUID, session: SessionDep) -> Any:
+    newsletter = session.get(Newsletter, newsletter_id)
+    if not newsletter:
+        raise HTTPException(status_code=404, detail="Newsletter not found")
+
+    # Obtener secciones asociadas a artículos dentro del newsletter
+    statement = select(Section).join(Article).where(Article.newsletter_id == newsletter_id).distinct()
+    sections = session.exec(statement).all()
+
+    section_articles_list = []
+    total_articles = 0
+
+    for section in sections:
+        articles_in_section = session.exec(
+            select(Article).where(
+                (Article.newsletter_id == newsletter_id) &
+                (Article.section_id == section.section_id)
+            )
+        ).all()
+        section_articles_list.append(
+            SectionArticles(
+                section=section.name,
+                articles=articles_in_section,
+                count=len(articles_in_section)
+            )
+        )
+        total_articles += len(articles_in_section)
+
+    return NewsletterArticles(
+        newsletter=newsletter.name,
+        data=section_articles_list,
+        total_articles=total_articles,
+        total_sections=len(section_articles_list)
+    )
