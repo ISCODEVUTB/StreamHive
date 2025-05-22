@@ -91,6 +91,55 @@ def create_article(
         )
     return article
 
+
+@router.get(
+    "/newsletter/latest",
+    response_model=NewsletterArticles
+)
+def get_latest_newsletter_articles(session: SessionDep) -> Any:
+    # Buscar el newsletter más reciente
+    latest_newsletter = session.exec(
+        select(Newsletter).order_by(Newsletter.name.desc()).limit(1)
+    ).first()
+
+    if not latest_newsletter:
+        raise HTTPException(status_code=404, detail="No newsletters found")
+
+    # Buscar secciones con artículos de ese newsletter
+    sections = session.exec(
+        select(Section)
+        .join(Article)
+        .where(Article.newsletter_id == latest_newsletter.newsletter_id)
+        .distinct()
+    ).all()
+
+    section_articles_list = []
+    total_articles = 0
+
+    for section in sections:
+        articles_in_section = session.exec(
+            select(Article).where(
+                (Article.newsletter_id == latest_newsletter.newsletter_id) &
+                (Article.section_id == section.section_id)
+            )
+        ).all()
+        section_articles_list.append(
+            SectionArticles(
+                section=section.name,
+                articles=articles_in_section,
+                count=len(articles_in_section)
+            )
+        )
+        total_articles += len(articles_in_section)
+
+    return NewsletterArticles(
+        newsletter=latest_newsletter.name,
+        data=section_articles_list,
+        total_articles=total_articles,
+        total_sections=len(section_articles_list)
+    )
+
+
 @router.get("/{article_id}", response_model=ArticlePublicEXT)
 def read_article_by_id(
     article_id: uuid.UUID, 
@@ -242,7 +291,7 @@ def delete_article(
     "/section/{section_id}",
     response_model=SectionArticles
 )
-def get_articles_by_section(section_id: uuid.UUID, session: SessionDep) -> Any:
+def get_articles_by_section(section_id: int, session: SessionDep) -> Any:
     section = session.get(Section, section_id)
     if not section:
         raise HTTPException(status_code=404, detail="Section not found")
@@ -257,58 +306,12 @@ def get_articles_by_section(section_id: uuid.UUID, session: SessionDep) -> Any:
         count=len(articles_in_section)
     )
 
-@router.get(
-    "/newsletter/latest",
-    response_model=NewsletterArticles
-)
-def get_latest_newsletter_articles(session: SessionDep) -> Any:
-    # Buscar el newsletter más reciente
-    latest_newsletter = session.exec(
-        select(Newsletter).order_by(Newsletter.created_at.desc()).limit(1)
-    ).first()
-
-    if not latest_newsletter:
-        raise HTTPException(status_code=404, detail="No newsletters found")
-
-    # Buscar secciones con artículos de ese newsletter
-    sections = session.exec(
-        select(Section)
-        .join(Article)
-        .where(Article.newsletter_id == latest_newsletter.newsletter_id)
-        .distinct()
-    ).all()
-
-    section_articles_list = []
-    total_articles = 0
-
-    for section in sections:
-        articles_in_section = session.exec(
-            select(Article).where(
-                (Article.newsletter_id == latest_newsletter.newsletter_id) &
-                (Article.section_id == section.section_id)
-            )
-        ).all()
-        section_articles_list.append(
-            SectionArticles(
-                section=section.name,
-                articles=articles_in_section,
-                count=len(articles_in_section)
-            )
-        )
-        total_articles += len(articles_in_section)
-
-    return NewsletterArticles(
-        newsletter=latest_newsletter.name,
-        data=section_articles_list,
-        total_articles=total_articles,
-        total_sections=len(section_articles_list)
-    )
 
 @router.get(
     "/newsletter/{newsletter_id}",
     response_model=NewsletterArticles
 )
-def get_articles_by_newsletter(newsletter_id: uuid.UUID, session: SessionDep) -> Any:
+def get_articles_by_newsletter(newsletter_id: int, session: SessionDep) -> Any:
     newsletter = session.get(Newsletter, newsletter_id)
     if not newsletter:
         raise HTTPException(status_code=404, detail="Newsletter not found")
