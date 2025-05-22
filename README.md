@@ -1,6 +1,6 @@
 # THE HIVE
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ISCODEVUTB_StreamHive&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ISCODEVUTB_StreamHive)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ISCODEVUTB_StreamHive&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ISCODEVUTB_StreamHive) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ISCODEVUTB_StreamHive&metric=coverage)](https://sonarcloud.io/summary/new_code?id=ISCODEVUTB_StreamHive)v
 
 The Hive is a comprehensive web application designed to unify and streamline data across streaming services, digital advertising, online publications, and press outlets. Its core mission is to deliver a seamless, secure, and enriched experience for film enthusiasts by integrating entertainment content discovery with personalized tools and industry insights. The platform not only facilitates movie exploration and management but also fosters a digital ecosystem that connects users with the latest in film culture and trends.
 

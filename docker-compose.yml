@@ -21,7 +21,7 @@ services:
 backend:
   build:
     context: .
-    dockerfile: Dockerfile
+    dockerfile: backend/Dockerfile
   restart: always
   networks:
     - default
@@ -32,7 +32,7 @@ backend:
     - .env.prod
   environment:
     - DOMAIN=${DOMAIN}
-    #    - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
+    - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
     - ENVIRONMENT=${ENVIRONMENT}
     - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS}
     - SECRET_KEY=${SECRET_KEY?Variable not set}
@@ -43,3 +43,13 @@ backend:
     - POSTGRES_DB=${POSTGRES_DB}
     - POSTGRES_USER=${POSTGRES_USER?Variable not set}
     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+
+frontend:
+  restart: always
+  build:
+    context: .
+    dockerfile: frontend/Dockerfile
+    args:
+      API_URL: https://thehive.up.railway.app
+  ports:
+    - "8080:80"
