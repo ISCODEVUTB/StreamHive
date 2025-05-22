@@ -21,7 +21,7 @@ services:
 backend:
   build:
     context: .
-    dockerfile: backend/Dockerfile
+    dockerfile: Dockerfile
   restart: always
   networks:
     - default
@@ -43,13 +43,3 @@ backend:
     - POSTGRES_DB=${POSTGRES_DB}
     - POSTGRES_USER=${POSTGRES_USER?Variable not set}
     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-
-frontend:
-  restart: always
-  build:
-    context: .
-    dockerfile: frontend/Dockerfile
-    args:
-      API_URL: https://thehive.up.railway.app
-  ports:
-    - "8080:80"
