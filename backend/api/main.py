@@ -10,7 +10,8 @@ from backend.api.routes import (
     ratings,
     follows,
     reactions,
-    comments
+    comments,
+    uploads
 )
 
 api_router = APIRouter()
@@ -24,3 +25,4 @@ api_router.include_router(reactions.router)
 api_router.include_router(comments.router)
 api_router.include_router(articles.router)
 api_router.include_router(article_tags.router)
+api_router.include_router(uploads.router)
