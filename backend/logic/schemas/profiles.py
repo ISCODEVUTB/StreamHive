@@ -65,7 +65,7 @@ class ProfilePublicEXT(ProfileBase):
         following_count (int): Number of users the profile is following.
     """
     profile_id: uuid.UUID
-    image_rel_path: str
+    image_rel_path: str | None = None
     movies_rated: int
     followers_count: int
     following_count: int
@@ -79,7 +79,7 @@ class ProfilePublic(ProfileBase):
         profile_id (uuid.UUID): Unique identifier for the profile.
     """
     profile_id: uuid.UUID
-    image_rel_path: str
+    image_rel_path: str | None = None
 
 
 class ProfilesPublic(SQLModel):
