@@ -18,6 +18,40 @@ from backend.api.schemas import Message
 router = APIRouter(prefix="/ratings", tags=["ratings"])
 
 
+@router.get(
+    "/profile",
+    dependencies=[Depends(get_current_user)],
+    response_model=ProfileRatingsPublic,
+)
+def read_my_ratings(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser   
+) -> ProfileRatingsPublic:
+    """
+    Retrieve all ratings made by a user (by profile).
+    """
+    statement = select(Profile).where(Profile.user_id == current_user.user_id)
+    profile_in: Profile = session.exec(statement).first()
+    profile_id = profile_in.profile_id
+
+    return ratings.get_ratings_by_profile(session=session, profile_id=profile_id)
+
+
+@router.get("/statistics", response_model=dict[str, int])
+def get_rating_statistics(*, session: SessionDep) -> dict[str, int]:
+    """
+    Get the statistics of rating values across all movies.
+    Returns a dictionary where keys are rating values (as strings) and values are counts.
+    """
+    results = session.exec(
+        select(Rating.rate, func.count(Rating.rate))
+        .group_by(Rating.rate)
+    ).all()
+
+    return {str(rate): count for rate, count in results}
+
+
 @router.post(
     "/movie/{movie_id}",
     dependencies=[Depends(get_current_user)],
@@ -48,26 +82,6 @@ def create_or_update_rating(
         rating_in=rating
     )
     return rating
-
-
-@router.get(
-    "/profile",
-    dependencies=[Depends(get_current_user)],
-    response_model=ProfileRatingsPublic,
-)
-def read_my_ratings(
-    *,
-    session: SessionDep,
-    current_user: CurrentUser   
-) -> ProfileRatingsPublic:
-    """
-    Retrieve all ratings made by a user (by profile).
-    """
-    statement = select(Profile).where(Profile.user_id == current_user.user_id)
-    profile_in: Profile = session.exec(statement).first()
-    profile_id = profile_in.profile_id
-
-    return ratings.get_ratings_by_profile(session=session, profile_id=profile_id)
 
 
 @router.get(

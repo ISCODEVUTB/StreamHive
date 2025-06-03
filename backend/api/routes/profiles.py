@@ -23,6 +23,17 @@ from backend.api.deps import CurrentUser, SessionDep, get_current_active_admin, 
 
 router = APIRouter(prefix="/profiles", tags=["profiles"])
 
+profile_not_found: dict[str, Any] = {
+            'username': 'Profile not found',
+            'image_rel_path': None,
+            'description': None,
+            'profile_role': None,
+            'lists_count': 0,
+            'movies_rated': 0,
+            'followers_count': 0,
+            'following_count': 0
+        }
+
 
 @router.get(
     "/",
@@ -106,7 +117,7 @@ def read_profile_by_user(
     result = session.exec(statement).first()
 
     if not result:
-        raise HTTPException(status_code=404, detail="Profile not found")
+        raise HTTPException(status_code=404, detail=profile_not_found)
 
     return ProfilePublicEXT(
         profile_id=result.profile_id,
@@ -171,7 +182,7 @@ def read_profile_by_id(
     result = session.exec(statement).first()
 
     if not result:
-        raise HTTPException(status_code=404, detail="Profile not found")
+        raise HTTPException(status_code=404, detail=profile_not_found)
 
     return ProfilePublicEXT(
         profile_id=result.profile_id,
