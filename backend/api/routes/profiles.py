@@ -3,6 +3,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import func, select
+from sqlalchemy.orm import selectinload
 
 from backend.api.schemas import Message
 from backend.logic.models import (
@@ -87,15 +88,37 @@ def delete_profile(
     return Message(message='Profile deleted successfully')
 
 
-@router.get("/my-profile", response_model=ProfilePublic)
+@router.get("/my-profile", response_model=ProfilePublicEXT)
 def read_profile_by_user( 
     session: SessionDep,
     current_user: CurrentUser
 ) -> Any:
-    statement = select(Profile).where(Profile.user_id == current_user.user_id)
-    profile = session.exec(statement).first()
-    print(profile)
-    return profile
+    statement = (
+        select(Profile)
+        .where(Profile.user_id == current_user.user_id)
+        .options(
+            selectinload(Profile.rating),
+            selectinload(Profile.followers),
+            selectinload(Profile.following),
+            selectinload(Profile.movie_list)
+        )
+    )
+    result = session.exec(statement).first()
+
+    if not result:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    return ProfilePublicEXT(
+        profile_id=result.profile_id,
+        image_rel_path=result.image_rel_path,
+        username=result.username,
+        description=result.description,
+        profile_role= result.profile_role,
+        lists_count=len(result.movie_list),
+        movies_rated=len(result.rating),
+        followers_count=len(result.followers),
+        following_count=len(result.following)
+    )
 
 
 @router.patch(
@@ -130,13 +153,37 @@ def update_logged_profile(
     return db_profile
     
 
-@router.get("/{profile_id}", response_model=ProfilePublic)
+@router.get("/{profile_id}", response_model=ProfilePublicEXT)
 def read_profile_by_id(
     profile_id: uuid.UUID, 
     session: SessionDep,
 ) -> Any:
-    profile = session.get(Profile, profile_id)
-    return profile
+    statement = (
+        select(Profile)
+        .where(Profile.profile_id == profile_id)
+        .options(
+            selectinload(Profile.rating),
+            selectinload(Profile.followers),
+            selectinload(Profile.following),
+            selectinload(Profile.movie_list)
+        )
+    )
+    result = session.exec(statement).first()
+
+    if not result:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    return ProfilePublicEXT(
+        profile_id=result.profile_id,
+        image_rel_path=result.image_rel_path,
+        username=result.username,
+        description=result.description,
+        profile_role= result.profile_role,
+        lists_count=len(result.movie_list),
+        movies_rated=len(result.rating),
+        followers_count=len(result.followers),
+        following_count=len(result.following)
+    )
 
 
 @router.patch(

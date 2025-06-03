@@ -67,6 +67,7 @@ class ProfilePublicEXT(ProfileBase):
     profile_id: uuid.UUID
     image_rel_path: str | None = None
     movies_rated: int
+    lists_count: int
     followers_count: int
     following_count: int
 
